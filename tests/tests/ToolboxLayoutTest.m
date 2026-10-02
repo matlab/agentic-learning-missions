@@ -9,8 +9,8 @@ classdef ToolboxLayoutTest < matlab.unittest.TestCase
         function validatesRequiredFiles(testCase, Root)
             root = string(Root);
 
-            testCase.verifyTrue(isfile(fullfile(root, "src", "interactiveMissionsApp.m")), ...
-                "missing app entry point: src/interactiveMissionsApp.m");
+            testCase.verifyTrue(isfile(fullfile(root, "src", "InteractiveMissions.m")), ...
+                "missing app entry point: src/InteractiveMissions.m");
             testCase.verifyTrue(isfile(fullfile(root, "src", "app", "index.html")), ...
                 "missing app HTML asset: src/app/index.html");
             testCase.verifyTrue(isfile(fullfile(root, "src", "app", "app.js")), ...
@@ -33,8 +33,8 @@ classdef ToolboxLayoutTest < matlab.unittest.TestCase
                 testCase.verifyTrue(isfile(fullfile(root, "src", "app", "assets", ...
                     "thumbnails", assetName)), "missing fallback thumbnail: " + assetName);
             end
-            testCase.verifyTrue(isfile(fullfile(root, "src", "+interactiveMissions", "openApp.m")), ...
-                "missing public app API: +interactiveMissions/openApp.m");
+            testCase.verifyTrue(isfile(fullfile(root, "src", "InteractiveMissions.m")), ...
+                "missing Apps Gallery entry point: src/InteractiveMissions.m");
             testCase.verifyTrue(isfile(fullfile(root, "buildfile.m")), ...
                 "missing build tool entry point: buildfile.m");
             testCase.verifyTrue(isfile(fullfile(root, "src", "skills", "mission-tutoring", "SKILL.md")), ...
@@ -92,7 +92,7 @@ classdef ToolboxLayoutTest < matlab.unittest.TestCase
 
             testCase.assertTrue(isfile(buildfilePath), "missing build tool entry point");
             buildfileText = fileread(buildfilePath);
-            for phrase = ["ToolboxOptions", "AppGalleryFiles", "PackageDependencies", "ProductDependencies"]
+            for phrase = ["ToolboxOptions", "AppGalleryFiles", "ProductDependencies"]
                 testCase.verifyTrue(contains(buildfileText, phrase), ...
                     "buildfile.m must configure " + phrase);
             end
@@ -106,13 +106,20 @@ classdef ToolboxLayoutTest < matlab.unittest.TestCase
                     "buildfile.m must configure " + phrase);
             end
 
-            for identifier = [
-                    "e7a3f1b2-6c4d-4e8f-9a2b-3d5c7f8e1a4b"
-                    "fce99a56-1b63-4d49-9d70-c32c5605e4eb"
-                    ]
-                testCase.verifyTrue(contains(buildfileText, identifier), ...
-                    "buildfile.m must reference dependency ID " + identifier);
-            end
+            testCase.verifyTrue(contains(buildfileText, "8c2c47ce-1c6a-4a53-94d6-8e6ec37e7b92"), ...
+                "buildfile.m must reference the Interactive Missions toolbox ID");
+        end
+
+        function validatesPathHelpers(testCase, Root)
+            root = string(Root);
+            testCase.verifyTrue(interactiveMissions.internal.isAbsolutePath(root), ...
+                "repository root must be recognized as an absolute path");
+            testCase.verifyTrue(interactiveMissions.internal.isPathWithin( ...
+                fullfile(root, "src"), root), ...
+                "a child folder must be recognized as inside its root");
+            testCase.verifyFalse(interactiveMissions.internal.isPathWithin( ...
+                root + "-other", root), ...
+                "a sibling with the same prefix must not be treated as a child");
         end
     end
 end

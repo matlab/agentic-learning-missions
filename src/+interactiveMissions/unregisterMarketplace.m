@@ -15,9 +15,9 @@ function unregisterMarketplace(options)
         error("InteractiveMissions:DefaultMarketplaceProtected", ...
             "The default marketplace is required and cannot be unregistered.");
     end
-    cacheBase = string(fullfile(prefdir(), "InteractiveMissions", "marketplaces")) + filesep;
+    cacheBase = string(fullfile(prefdir(), "InteractiveMissions", "marketplaces"));
     cacheRoot = string(record.CacheRoot);
-    if strlength(cacheRoot) > 0 && startsWith(lower(cacheRoot), lower(cacheBase)) && isfolder(cacheRoot)
+    if strlength(cacheRoot) > 0 && interactiveMissions.internal.isPathWithin(cacheRoot, cacheBase) && isfolder(cacheRoot)
         rmdir(fileparts(cacheRoot), "s");
     end
     records(recordIndex) = [];

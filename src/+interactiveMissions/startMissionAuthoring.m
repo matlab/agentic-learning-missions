@@ -296,11 +296,10 @@ function workspaceRoot = absolutePath(workspaceRoot)
         error("InteractiveMissions:InvalidWorkspace", ...
             "WorkspaceRoot must not contain parent-folder references.");
     end
-    if isempty(regexp(workspaceRoot, "^[A-Za-z]:[\\/]", "once")) && ~startsWith(workspaceRoot, filesep)
+    if ~interactiveMissions.internal.isAbsolutePath(workspaceRoot)
         workspaceRoot = fullfile(pwd(), workspaceRoot);
     end
     workspaceRoot = replace(workspaceRoot, "/", filesep);
-    workspaceRoot = regexprep(workspaceRoot, "[" + regexptranslate("escape", filesep) + "]+", filesep);
 end
 
 function writeManifest(manifestPath, marketplaceId, marketplaceTitle, sourceUrl, records)
@@ -415,7 +414,7 @@ end
 
 function validateRelativePath(path)
     path = string(path);
-    if contains(path, "..") || startsWith(path, filesep) || ~isempty(regexp(path, "^[A-Za-z]:[\\/]", "once"))
+    if contains(path, "..") || interactiveMissions.internal.isAbsolutePath(path)
         error("InteractiveMissions:UnsafePath", "Unsafe adapter path: %s", path);
     end
 end

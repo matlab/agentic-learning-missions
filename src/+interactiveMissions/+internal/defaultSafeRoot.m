@@ -15,8 +15,9 @@ function folder = matlabUserFolder()
         return
     end
 
-    homeFolder = string(getenv("USERPROFILE"));
-    if strlength(homeFolder) == 0
+    if ispc
+        homeFolder = string(getenv("USERPROFILE"));
+    else
         homeFolder = string(getenv("HOME"));
     end
     if strlength(homeFolder) == 0

@@ -191,7 +191,7 @@ end
 
 function sourcePath = resolveMissionResource(relativePath, sourceRoot)
     relativePath = string(relativePath);
-    if ~isempty(regexp(relativePath, "^[A-Za-z]:[\\/]", "once")) || startsWith(relativePath, filesep)
+    if interactiveMissions.internal.isAbsolutePath(relativePath)
         sourcePath = relativePath;
     else
         sourcePath = fullfile(sourceRoot, relativePath);
@@ -297,7 +297,7 @@ function ensureSafeWorkspace(workspaceRoot, requireEmpty)
     createFolder(workspaceRoot);
     workspaceRoot = absolutePath(workspaceRoot);
     marketplaceCacheRoot = absolutePath(fullfile(prefdir(), "InteractiveMissions", "marketplaces"));
-    if startsWith(lower(workspaceRoot), lower(marketplaceCacheRoot))
+    if interactiveMissions.internal.isPathWithin(workspaceRoot, marketplaceCacheRoot)
         error("InteractiveMissions:InvalidWorkspace", ...
             "The learner workspace must not be inside the marketplace cache.");
     end
@@ -315,11 +315,10 @@ end
 
 function path = absolutePath(path)
     path = string(path);
-    if isempty(regexp(path, "^[A-Za-z]:[\\/]", "once")) && ~startsWith(path, filesep)
+    if ~interactiveMissions.internal.isAbsolutePath(path)
         path = fullfile(pwd(), path);
     end
     path = replace(path, "/", filesep);
-    path = regexprep(path, "[" + regexptranslate("escape", filesep) + "]+", filesep);
 end
 
 function createFolder(folder)
@@ -464,7 +463,7 @@ end
 
 function validateRelativePath(path)
     path = string(path);
-    if contains(path, "..") || startsWith(path, filesep) || ~isempty(regexp(path, "^[A-Za-z]:[\\/]", "once"))
+    if contains(path, "..") || interactiveMissions.internal.isAbsolutePath(path)
         error("InteractiveMissions:UnsafePath", "Unsafe resource path: %s", path);
     end
 end

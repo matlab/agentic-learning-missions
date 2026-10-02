@@ -33,11 +33,11 @@ end
 
 function roots = cachedMarketplaceRoots()
     records = interactiveMissions.internal.marketplaceRegistry("get");
-    cacheBase = fullfile(prefdir(), "InteractiveMissions", "marketplaces") + filesep;
+    cacheBase = fullfile(prefdir(), "InteractiveMissions", "marketplaces");
     roots = strings(0, 1);
     for recordIndex = 1:numel(records)
         cacheRoot = string(records(recordIndex).CacheRoot);
-        if startsWith(lower(cacheRoot), lower(cacheBase)) && isfolder(cacheRoot)
+        if interactiveMissions.internal.isPathWithin(cacheRoot, cacheBase) && isfolder(cacheRoot)
             try
                 roots(end + 1, 1) = marketplaceContentRoot(cacheRoot); %#ok<AGROW>
             catch exception

@@ -55,6 +55,5 @@ end
 
 function value = quoteUserPath(value)
     value = string(value);
-    value = replace(value, "\", "/");
     value = """" + replace(value, """", """""") + """";
 end
