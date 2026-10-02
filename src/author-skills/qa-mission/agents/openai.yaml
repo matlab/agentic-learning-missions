@@ -1,0 +1,5 @@
+display_name: QA Mission
+description: Review a tutor mission YAML and supporting files for clarity, completeness, and correctness.
+default_prompt: Use the qa-mission skill to review the requested mission and produce actionable findings.
+policy:
+  allow_implicit_invocation: true

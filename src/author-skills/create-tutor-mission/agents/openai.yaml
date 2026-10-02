@@ -1,0 +1,5 @@
+display_name: Create Tutor Mission
+description: Scaffold a new tutor mission YAML file and optional MATLAB setup script.
+default_prompt: Use the create-tutor-mission skill to design and scaffold a new interactive mission.
+policy:
+  allow_implicit_invocation: true

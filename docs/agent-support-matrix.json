@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "feedback": {
+    "public_surface": "none",
+    "support_owner": "undecided",
+    "policy": "Do not expose learner or author feedback routing until an owner and destination are selected."
+  },
+  "logging": {
+    "public_surface": "absent",
+    "default": "off",
+    "policy": "Do not add session logging until privacy, storage, retention, and user-control requirements are defined."
+  },
+  "agents": [
+    {
+      "id": "codex",
+      "display_name": "OpenAI Codex",
+      "supported": true,
+      "adapter_path": "src/adapters/codex/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/codex/adapter.yaml"
+    },
+    {
+      "id": "claude-code",
+      "display_name": "Claude Code",
+      "supported": true,
+      "adapter_path": "src/adapters/claude-code/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/claude-code/adapter.yaml"
+    },
+    {
+      "id": "gemini-cli",
+      "display_name": "Gemini CLI",
+      "supported": true,
+      "adapter_path": "src/adapters/gemini-cli/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/gemini-cli/adapter.yaml"
+    },
+    {
+      "id": "github-copilot-vscode",
+      "display_name": "GitHub Copilot in VS Code",
+      "supported": true,
+      "adapter_path": "src/adapters/github-copilot-vscode/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/github-copilot-vscode/adapter.yaml"
+    },
+    {
+      "id": "github-copilot-cli",
+      "display_name": "GitHub Copilot CLI",
+      "supported": true,
+      "adapter_path": "src/adapters/github-copilot-cli/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/github-copilot-cli/adapter.yaml"
+    },
+    {
+      "id": "generic",
+      "display_name": "Generic",
+      "supported": true,
+      "adapter_path": "src/adapters/generic/adapter.yaml",
+      "author_adapter_path": "src/author-adapters/generic/adapter.yaml"
+    }
+  ]
+}

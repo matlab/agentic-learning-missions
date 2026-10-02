@@ -1,0 +1,188 @@
+mission_id: "02"
+version: "1.0.1"
+title: Continuous and Discrete Time in Simulink
+objective: >
+  Learn how Simulink represents continuous-time behavior and discrete-time
+  sampled behavior in the same model. You will build a model that represents
+  a sensor sampling a continuous signal at discrete time intervals. This 
+  mission assumes that you already know how to create a Simulink model,
+  add and connect blocks, and set block parameters.
+supported_matlab_releases: [R2024b, R2025a, R2025b, R2026a, R2026b]
+required_capabilities: [MATLAB, Simulink, MATLAB MCP, Simulink Agentic Toolkit]
+write_mode: read_inspect
+capability_mode: guided_tutor
+
+app:
+  summary: Build one model that compares continuous and sampled discrete-time behavior.
+  audience: Beginner Simulink learners exploring time representation and sample times.
+  difficulty: beginner
+  estimated_minutes: 35
+  products: [MATLAB, Simulink]
+  topics: [continuous time, discrete time, sample time, zero-order hold]
+  status: published
+  learner_visible: true
+  tile_order: 20
+
+learning_outcomes:
+  - id: lo01
+    description: Compare continuous and sampled signal behavior in a shared display.
+  - id: lo02
+    description: Represent both continuous-time and discrete-time behavior in a Simulink model.
+
+discovery:
+  model_name:
+    tool: evaluate_matlab_code
+    code: "bdroot"
+    note: >
+      The learner creates their own model. Use bdroot or
+      find_system('type','block_diagram') to discover its name.
+      Store the result and use it for all subsequent model_read /
+      model_query_params calls.
+
+# Notes for the tutor (Ada):
+# - This mission has no setup script. Task 1 starts from the learner's current
+#   MATLAB/Simulink environment.
+# - After t01 completes, run the discovery step to learn the model name.
+# - Completion checks are semantic; use judgment rather than brittle matching.
+
+tasks:
+  - id: "t01"
+    title: Visualize a continuous Sine Wave
+    involves: [file_edit, command, output_interpretation]
+    outcome_refs: [lo02]
+    instruction: >
+      Create a new Simulink model with a Sine Wave block configured for
+      continuous-time output, then display its signal on a Scope block after
+      running the model.
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: "a Simulink model is open (use `find_system('type','block_diagram')`)"
+        - tool: model_read
+          check: >
+            the current model contains a Sine Wave source connected to a
+            display
+        - tool: model_query_params
+          check: >
+            the Sine Wave source is configured for continuous-time output
+        - tool: evaluate_matlab_code
+          check: >
+            simulation has completed for the current model; verify the model is
+            not still running and no blocking simulation error is present.
+      description: >
+        A model is open with a continuous-time Sine Wave connected to a display.
+    hints:
+      - A source produces a signal, while a display sink lets you observe it.
+      - Use a Sine Wave source with continuous-time output and connect it to a Scope block.
+      - Add a Sine Wave and Scope from the Simulink library, connect the source output to the display input, and run the model.
+
+  - id: "t02"
+    title: Compare continuous and discrete time
+    involves: [configuration, command, output_interpretation]
+    outcome_refs: [lo01, lo02]
+    instruction: >
+      Reconfigure the same Sine Wave block to update at a positive finite
+      sample interval by specifying a positive value for its Sample Time
+      parameter. Run the model again, and observe how this differs from the
+      continuous result.
+    completion:
+      strategy:
+        - tool: model_read
+          check: >
+            the current model still routes the Sine Wave source to a display
+        - tool: model_query_params
+          check: >
+            the Sine Wave source has a positive finite sample interval
+        - tool: evaluate_matlab_code
+          check: >
+            simulation has completed for the current model; verify the model is
+            not still running and no blocking simulation error is present.
+      description: >
+        The model runs with the Sine Wave configured as a discrete-time source.
+    hints:
+      - Sample time controls when a source produces new values.
+      - A zero sample time represents continuous behavior; a positive interval represents discrete behavior.
+      - Set the Sine Wave Sample Time to a visible positive interval such as 0.1 seconds, then run the model again.
+
+  - id: "t03"
+    title: Sample a continuous signal
+    involves: [file_edit, configuration, command]
+    outcome_refs: [lo02]
+    instruction: >
+      Restore the Sine Wave source to continuous-time output, then add a
+      sampling stage, such as a Zero-Order Hold block, to sample that signal
+      at a discrete rate. Configure the sampling stage with a positive sample
+      time and run the model again.
+    completion:
+      strategy:
+        - tool: model_read
+          check: >
+            the current model routes the continuous-time Sine Wave source
+            through a sampling-and-hold stage to a display; accept any
+            sampling-stage implementation that observably samples and holds
+            the Sine Wave signal
+        - tool: model_query_params
+          check: >
+            inspect the Sine Wave source and sampling-stage parameters and
+            verify the Sine Wave is continuous while the downstream stage
+            updates at a positive finite interval and holds each sampled value
+            between updates; do not require a specific sampling-stage block type
+        - tool: evaluate_matlab_code
+          check: >
+            simulation has completed for the current model; verify the model is
+            not still running and no blocking simulation error is present.
+      description: >
+        The model now has a discrete-time sampled version of the continuous
+        Sine Wave signal.
+    hints:
+      - The Sine Wave source and sampling stage represent different time behaviors.
+      - A Zero-Order Hold preserves each measured value until the next sample time.
+      - Restore the Sine Wave sample time to 0, insert a Zero-Order Hold between the source and display, set its sample time to a positive value such as 0.1, and run the model.
+
+  - id: "t04"
+    title: Compare both time modes
+    involves: [file_edit, configuration, output_interpretation]
+    outcome_refs: [lo01, lo02]
+    instruction: >
+      Route both the continuous Sine Wave output and its sampled version to
+      one Scope so you can compare them side by side. Give the two signals
+      clear labels.
+    completion:
+      strategy:
+        - tool: model_read
+          check: >
+            both the continuous Sine Wave signal and a sampled signal derived
+            from that Sine Wave are routed to one display, using any valid
+            multi-input or combined-signal arrangement, and signal labels or
+            display names clearly distinguish the two traces without requiring
+            exact wording
+      description: >
+        The model displays the continuous Sine Wave and its discrete sampled
+        signal together for comparison.
+    hints:
+      - A branch lets one Sine Wave source feed more than one signal path.
+      - Feed the Sine Wave directly to one Scope input and through the sampling stage to another, then give both signal lines descriptive names.
+      - Branch the Sine Wave before the sampling stage, configure the Scope for two inputs or combine both signals, and label the traces so one is clearly continuous and the other sampled.
+
+  - id: "t05"
+    title: Show sample times
+    involves: [configuration, output_interpretation]
+    outcome_refs: [lo02]
+    instruction: >
+      Enable a visible sample-time overlay and update the model so you can
+      inspect the different sample times visually. You can find this display 
+      in the Simulink toolstrip > Debug tab > Diagnostics > Information Overlays.
+    completion:
+      strategy:
+        - tool: model_query_params
+          check: >
+            the current model visibly distinguishes sample times using
+            annotations, colors, or another supported sample-time overlay;
+            accept any one option that satisfies the instruction
+      description: >
+        A sample-time overlay is visible so the learner can inspect the model's
+        sample times.
+    hints:
+      - In the Information Overlays menu, look for the Sample Time section.
+      - Sample-time colors or annotations can distinguish continuous and sampled regions after the diagram updates.
+      - If you cannot find the toolstrip item, you can use the command line command `set_param(bdroot,"SampleTimeColors","on")`, then update the diagram to refresh the overlay.

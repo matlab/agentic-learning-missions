@@ -1,0 +1,8 @@
+{
+    "defaultMarketplace": {
+        "id": "mathworks-interactive-missions",
+        "sourceUrl": "https://github.com/mathworks/interactive-missions",
+        "referenceType": "branch",
+        "referenceName": "main"
+    }
+}

@@ -1,0 +1,9 @@
+id: "generic"
+display_name: "Generic"
+required: true
+entry_file: "AGENTS.md"
+files:
+  - source: "AGENTS.md"
+    target: "AGENTS.md"
+  - source: "START_AUTHORING.md"
+    target: "START_AUTHORING.md"

@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Interactive Missions</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="app-shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">IM</div>
+                <div>
+                    <h1>Interactive Missions</h1>
+                    <p id="identitySummary">Loading missions...</p>
+                </div>
+            </div>
+        </header>
+
+        <nav class="toolstrip-tabs" role="tablist" aria-label="Interactive Missions toolstrip">
+            <button class="tab is-active" role="tab" aria-selected="true" type="button" data-view="missions">Missions</button>
+            <button class="tab" role="tab" aria-selected="false" type="button" data-view="learner-faq">Learner FAQ</button>
+            <button class="tab" role="tab" aria-selected="false" type="button" data-view="documentation">Authoring Help</button>
+            <button class="tab" role="tab" aria-selected="false" type="button" data-view="settings">Settings</button>
+        </nav>
+
+        <main class="workspace">
+            <section id="missionsView" class="view is-active">
+                <div id="missionGrid" class="mission-grid"></div>
+            </section>
+
+            <section id="learnerFaqView" class="view">
+                <div class="docs-shell docs-single">
+                    <article class="docs-reader">
+                        <div id="learnerFaqContent" class="docs-content"></div>
+                    </article>
+                    <aside class="docs-sidebar docs-toc" aria-label="Learner FAQ sections">
+                        <div class="panel-title">On This Page</div>
+                        <div id="learnerFaqHeadingList" class="docs-nav"></div>
+                    </aside>
+                </div>
+            </section>
+
+            <section id="documentationView" class="view">
+                <div class="docs-shell">
+                    <aside class="docs-sidebar docs-pages" aria-label="Documentation pages">
+                        <div class="panel-title">Pages</div>
+                        <div id="documentationPageList" class="docs-nav"></div>
+                    </aside>
+                    <article class="docs-reader">
+                        <div id="documentationContent" class="docs-content"></div>
+                    </article>
+                    <aside class="docs-sidebar docs-toc" aria-label="Page sections">
+                        <div class="panel-title">On This Page</div>
+                        <div id="documentationHeadingList" class="docs-nav"></div>
+                    </aside>
+                </div>
+            </section>
+
+            <section id="settingsView" class="view">
+                <div class="settings-page">
+                    <section class="settings-card">
+                        <div class="section-toolbar">
+                            <h2>App settings</h2>
+                        </div>
+                        <label>
+                            <span>Toolbox files</span>
+                            <input id="repositoryRootInput" type="text" readonly>
+                        </label>
+                        <label>
+                            <span>Marketplace cache folder</span>
+                            <input id="marketplaceCacheRootInput" type="text" readonly>
+                        </label>
+                        <label>
+                            <span>Work folder base</span>
+                            <div class="field-row">
+                                <input id="workspaceRootInput" type="text">
+                                <button id="chooseWorkspaceButton" type="button">Browse</button>
+                            </div>
+                        </label>
+                        <div class="settings-actions">
+                            <button id="saveSettingsButton" class="primary" type="button">Save settings</button>
+                        </div>
+                    </section>
+                    <section class="settings-card">
+                        <div class="section-toolbar">
+                            <h2>Marketplace</h2>
+                            <button id="openRegisterMarketplaceButton" class="primary" type="button">Add marketplace</button>
+                            <button id="refreshMarketplacesButton" type="button">Refresh</button>
+                        </div>
+                        <div class="marketplace-table-wrap">
+                            <table class="marketplace-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Marketplace</th>
+                                        <th scope="col">Source</th>
+                                        <th scope="col">Branch/tag</th>
+                                        <th scope="col">Version</th>
+                                        <th scope="col">Missions</th>
+                                        <th scope="col"><span class="visually-hidden">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="marketplaceRows"></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </section>
+        </main>
+
+        <div id="toast" class="toast" hidden></div>
+        <div id="registerMarketplaceModal" class="modal-backdrop" hidden>
+            <section class="modal" role="dialog" aria-modal="true" aria-labelledby="registerMarketplaceTitle">
+                <div class="modal-header">
+                    <h2 id="registerMarketplaceTitle">Add marketplace</h2>
+                    <button id="closeRegisterMarketplaceButton" class="modal-close" type="button" title="Close">Close</button>
+                </div>
+                <form id="registerMarketplaceForm">
+                    <div class="modal-body settings-grid">
+                        <label>
+                            <span>Repository URL</span>
+                            <input id="marketplaceUrlInput" type="text" placeholder="https://git.example.com/group/repository" aria-describedby="marketplaceUrlHelp">
+                            <small id="marketplaceUrlHelp">Use your existing Git Credential Manager or SSH agent sign-in if the repository requires access.</small>
+                        </label>
+                        <label>
+                            <span>Reference</span>
+                            <select id="marketplaceReferenceType">
+                                <option value="default">Default branch</option>
+                                <option value="branch">Branch</option>
+                                <option value="tag">Tag</option>
+                            </select>
+                        </label>
+                        <label id="marketplaceReferenceNameField" hidden>
+                            <span id="marketplaceReferenceNameLabel">Branch name</span>
+                            <input id="marketplaceReferenceNameInput" type="text">
+                        </label>
+                        <p id="marketplaceRegistrationStatus" class="settings-path" role="status" hidden></p>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="registerMarketplaceButton" class="primary" type="submit">Add</button>
+                        <button id="cancelRegisterMarketplaceButton" type="button">Cancel</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+        <div id="marketplaceConfirmModal" class="modal-backdrop" hidden>
+            <section class="modal" role="dialog" aria-modal="true" aria-labelledby="marketplaceConfirmTitle">
+                <div class="modal-header"><h2 id="marketplaceConfirmTitle">Confirm marketplace change</h2></div>
+                <div class="modal-body">
+                    <p id="marketplaceConfirmMessage"></p>
+                    <p id="marketplaceConfirmStatus" class="settings-path" role="status" hidden></p>
+                </div>
+                <div class="modal-actions">
+                    <button id="marketplaceConfirmAction" class="primary" type="button">Continue</button>
+                    <button id="marketplaceConfirmCancel" type="button">Cancel</button>
+                </div>
+            </section>
+        </div>
+
+        <div id="launchSetupModal" class="modal-backdrop" hidden>
+            <section class="modal" role="dialog" aria-modal="true" aria-labelledby="launchSetupTitle">
+                <div class="modal-header">
+                    <h2 id="launchSetupTitle">Mission Workspace</h2>
+                    <button id="closeLaunchSetupButton" class="modal-close" type="button" title="Close">Close</button>
+                </div>
+                <div class="modal-body settings-grid">
+                    <label>
+                        <span>Generated work folder</span>
+                        <div class="field-row">
+                            <input id="launchWorkspaceInput" type="text">
+                            <button id="chooseLaunchWorkspaceButton" type="button">Browse</button>
+                        </div>
+                    </label>
+                    <label>
+                        <span>Agentic client</span>
+                        <select id="launchAgentClientSelect">
+                            <option value="">Select an agentic client</option>
+                            <option value="codex">Codex</option>
+                            <option value="claude-code">Claude Code</option>
+                            <option value="gemini-cli">Gemini CLI</option>
+                            <option value="github-copilot-vscode">GitHub Copilot in VS Code</option>
+                            <option value="github-copilot-cli">GitHub Copilot CLI</option>
+                            <option value="generic">Generic</option>
+                        </select>
+                    </label>
+                    <p class="settings-path">Ada will ask how the learner wants to be addressed when the mission begins.</p>
+                </div>
+                <div class="modal-actions">
+                    <button id="continueLaunchButton" class="primary" type="button">Continue</button>
+                    <button id="cancelLaunchButton" type="button">Cancel</button>
+                </div>
+            </section>
+        </div>
+
+        <div id="resumeModal" class="modal-backdrop" hidden>
+            <section class="modal" role="dialog" aria-modal="true" aria-labelledby="resumeTitle">
+                <div class="modal-header">
+                    <h2 id="resumeTitle">Resume Mission</h2>
+                    <button id="closeResumeButton" class="modal-close" type="button" title="Close">Close</button>
+                </div>
+                <div class="modal-body">
+                    <div id="resumeRows" class="data-list"></div>
+                </div>
+                <div class="modal-actions">
+                    <button id="dismissResumeButton" type="button">Close</button>
+                </div>
+            </section>
+        </div>
+
+        <div id="promptModal" class="modal-backdrop" hidden>
+            <section class="modal prompt-modal" role="dialog" aria-modal="true" aria-labelledby="promptTitle">
+                <div class="modal-header">
+                    <h2 id="promptTitle">Launch Instructions</h2>
+                    <button id="closePromptButton" class="modal-close" type="button" title="Close">Close</button>
+                </div>
+                <div class="modal-body prompt-body">
+                    <div class="launch-steps">
+                        <section class="launch-step">
+                            <p><strong>1.</strong> <span id="promptStep1Text">Open your preferred terminal.</span></p>
+                        </section>
+                        <section class="launch-step">
+                            <p><strong>2.</strong> <span id="promptStep2Text">Navigate to the work folder.</span></p>
+                            <div class="copy-row">
+                                <pre id="promptCommand" class="command-box"></pre>
+                                <button id="copyCommandButton" type="button">Copy</button>
+                            </div>
+                        </section>
+                        <section class="launch-step">
+                            <p><strong>3.</strong> <span id="promptStep3Text">Launch your code agent.</span></p>
+                        </section>
+                        <section class="launch-step">
+                            <p><strong>4.</strong> <span id="promptStep4Text">$mission-tutoring</span></p>
+                        </section>
+                    </div>
+                    <label id="promptContextField"><span>Instructions</span><textarea id="promptText" readonly></textarea></label>
+                </div>
+                <div class="modal-actions">
+                    <button id="copyPromptButton" class="primary" type="button">Copy Instructions</button>
+                    <button id="dismissPromptButton" type="button">Close</button>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div hidden>
+        <template id="fallback-thumbnail-graduationcap">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true">
+                <path fill="#616161" d="M88.96 33.96 53.8 16.96a4.56 4.56 0 0 0-3.92 0L14.71 33.96a2.5 2.5 0 0 0 0 4.5L19 40.53V67.5c-.4.02-.79.19-1.07.51-1.82 2.1-4.47 6.88-2.88 11.47.22.62.8 1.01 1.42 1.01.16 0 .33-.03.49-.08.78-.27 1.2-1.12.93-1.91-.66-1.89-.2-3.92.52-5.57-.14 2.13-.22 4.73.06 7.23.09.77.74 1.33 1.49 1.33h.17c.82-.09 1.41-.84 1.32-1.66-.28-2.5-.16-5.17 0-7.29.81 1.71 1.41 3.92.7 5.96-.27.78.14 1.64.93 1.91.16.06.33.08.49.08.62 0 1.2-.39 1.42-1.01 1.59-4.59-1.06-9.37-2.88-11.47l-.08-.08V41.96l5 2.42v18.15c0 .7.16 1.33.47 1.88 1.39 2.42 7.25 10.33 24.36 10.33H52c17.08 0 23.07-7.88 24.5-10.29.33-.56.5-1.21.5-1.94V44.43l11.98-5.79a2.5 2.5 0 0 0-.02-4.68ZM74 62.53c0 .12-.01.29-.08.41-1.22 2.07-6.43 8.82-21.92 8.82h-.17c-15.5 0-20.57-6.75-21.76-8.82-.06-.11-.08-.27-.08-.39v-16.7l19.88 9.61a4.57 4.57 0 0 0 3.92 0L74 45.69v16.84ZM52.49 52.75a1.48 1.48 0 0 1-1.31 0L29.15 42.1l-7.5-3.62a2.5 2.5 0 0 0-1.15-.56l-3.56-1.72 34.23-16.54a1.48 1.48 0 0 1 1.31 0l34.23 16.54-34.22 16.55Z"/>
+            </svg>
+        </template>
+        <template id="fallback-thumbnail-matlab">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 104 104" aria-hidden="true">
+                <path fill="#616161" d="M89.69 75.26c-1.97-4.58-3.99-9.65-6.16-15.47-1.97-5.28-3.9-10.69-5.75-16.06-.65-1.87-1.26-3.78-1.89-5.71-1.9-5.85-3.86-11.9-6.71-17.29-1.62-3.06-3.64-6.29-6.38-7.06-1.16-.33-2.35-.16-3.43.48-2.15 1.28-4.05 4.62-5.58 7.31-.42.75-.81 1.43-1.16 1.98-2.38 3.79-6 9.1-9.96 11.51-.61.37-1.02.49-1.7.69l-.76.23c-4.04 1.3-6.76 4.8-9.16 7.89l-1.29 1.64-21.18 8.74a2.5 2.5 0 0 0-.51 4.34l15.56 11.28c.33.24.68.37 1.06.4.78.04 1.5-.31 2.15-.63l.43-.2c3.7-1.31 5.8 2.16 8.16 6.84l.38.76 5.1 11.93a2.5 2.5 0 0 0 2.87 1.43c6.12-1.61 10.68-6.52 14.47-11l1.77-2.17c3.36-4.16 7.95-9.87 12.38-10.13 1.88-.1 3.9.79 6.39 2.84 1.18.97 2.4 2.09 3.57 3.17l1.46 1.33c.89.81 2.47 2.11 3.33 2.82.78.64 1.6.46 2.06.11.6-.46.79-1.26.47-1.99ZM41.14 38.72l.68-.21c.75-.22 1.46-.43 2.41-1 2.16-1.31 4.15-3.26 5.94-5.41-2.48 6.03-6.04 13.54-10.58 20.29l-6.89-5.9.71-.9c2.24-2.88 4.55-5.86 7.71-6.87ZM10.56 56.57l19.78-8.16 7.53 6.45c-3.33 4.55-7.11 8.6-11.35 11.38l-1.5.82-14.47-10.49ZM84.4 70.77c-1.21-1.11-2.45-2.26-3.7-3.28-1.95-1.61-4.96-3.72-8.47-3.51-5.75.34-10.83 6.64-14.54 11.24l-1.73 2.11c-3.4 4.01-7.43 8.39-12.48 9.91l-4.94-11.55-.44-.88c-1.41-2.8-3.5-6.94-6.88-8.32 6.69-5.48 12.93-14.23 18.59-26.09 4.6-9.65 7.09-17.8 7.39-18.83 1.16-1.99 2.52-4.13 3.71-4.84.38-.22.71-.28 1.08-.17 1.87.53 3.88 4.32 4.54 5.57 2.73 5.17 4.65 11.09 6.5 16.82.63 1.94 1.26 3.87 1.91 5.76 1.86 5.4 3.8 10.82 5.78 16.13 1.37 3.67 2.67 7.04 3.95 10.18l-.26-.24Z"/>
+            </svg>
+        </template>
+        <template id="fallback-thumbnail-simulink">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+                <path fill="#616161" d="M77.5 50H65.96c.15-.08.29-.2.39-.36l3.2-5.11A1 1 0 0 0 68.7 43H67v-6.5a4.5 4.5 0 0 0-4.5-4.5H51.1a4.5 4.5 0 0 0-2.11-2.99L25.79 15.29a4.5 4.5 0 0 0-6.79 3.87v12.83h-7.09a1.5 1.5 0 0 0 0 3H19v11.61a4.5 4.5 0 0 0 6.79 3.91l23.2-13.72a4.5 4.5 0 0 0 1.68-1.76H62.5a1.5 1.5 0 0 1 1.5 1.5V43h-1.7a1 1 0 0 0-.85 1.53l3.2 5.11c.1.16.24.28.39.36H51.5a4.5 4.5 0 0 0-4.5 4.5v25.65a4.5 4.5 0 0 0 4.5 4.5h26a4.5 4.5 0 0 0 4.5-4.5V54.5a4.5 4.5 0 0 0-4.5-4.5ZM47.46 34.18 24.26 47.9c-.68.4-1.28.14-1.51 0s-.76-.52-.76-1.3V19.16c0-.79.53-1.17.76-1.3.14-.08.41-.2.75-.2.23 0 .49.06.76.21l23.2 13.72c.66.39.74 1.03.74 1.29s-.07.9-.74 1.29ZM79 80.15a1.5 1.5 0 0 1-1.5 1.5h-26a1.5 1.5 0 0 1-1.5-1.5V54.5a1.5 1.5 0 0 1 1.5-1.5h26a1.5 1.5 0 0 1 1.5 1.5v25.65Z"/>
+            </svg>
+        </template>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

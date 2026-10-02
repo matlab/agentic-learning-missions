@@ -1,0 +1,6 @@
+id: "github-copilot-cli"
+display_name: "GitHub Copilot CLI"
+entry_file: "COPILOT.md"
+files:
+  - source: "COPILOT.md"
+    target: "COPILOT.md"

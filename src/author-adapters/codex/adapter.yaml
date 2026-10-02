@@ -1,0 +1,6 @@
+id: "codex"
+display_name: "Codex"
+entry_file: "AGENTS.md"
+files:
+  - source: "AGENTS.md"
+    target: "AGENTS.md"

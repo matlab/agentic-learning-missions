@@ -1,0 +1,5 @@
+display_name: Maintain Missions
+description: Maintain the Interactive Missions framework layout, metadata, docs, and smoke tests.
+default_prompt: Use the maintain-missions skill to validate or clean up the Interactive Missions framework.
+policy:
+  allow_implicit_invocation: true

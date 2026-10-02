@@ -1,0 +1,8 @@
+id: "github-copilot-vscode"
+display_name: "GitHub Copilot in VS Code"
+entry_file: ".github/copilot-instructions.md"
+files:
+  - source: "copilot-instructions.md"
+    target: ".github/copilot-instructions.md"
+  - source: "mission-tutoring.prompt.md"
+    target: ".github/prompts/mission-tutoring.prompt.md"

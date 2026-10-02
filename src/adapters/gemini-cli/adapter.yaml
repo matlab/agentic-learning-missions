@@ -1,0 +1,6 @@
+id: "gemini-cli"
+display_name: "Gemini CLI"
+entry_file: "GEMINI.md"
+files:
+  - source: "GEMINI.md"
+    target: "GEMINI.md"

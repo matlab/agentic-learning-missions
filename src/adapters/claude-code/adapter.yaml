@@ -1,0 +1,8 @@
+id: "claude-code"
+display_name: "Claude Code"
+entry_file: "CLAUDE.md"
+files:
+  - source: "CLAUDE.md"
+    target: "CLAUDE.md"
+  - source: "mission-tutoring.md"
+    target: ".claude/commands/mission-tutoring.md"

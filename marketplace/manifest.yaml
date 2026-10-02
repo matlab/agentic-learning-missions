@@ -1,0 +1,22 @@
+schema_version: "2.0"
+id: "mathworks-interactive-missions"
+title: "MathWorks Interactive Missions"
+source_url: "https://github.com/mathworks/interactive-missions"
+content_version: "0.2.4"
+minimum_toolbox_version: "0.2.0"
+summary: >
+  Beginner-friendly MATLAB and Simulink learning missions prepared for the
+  Interactive Missions toolbox app and supported agentic clients.
+publisher: "The MathWorks, Inc."
+adapters:
+  - id: "generic"
+  - id: "codex"
+  - id: "claude-code"
+  - id: "gemini-cli"
+  - id: "github-copilot-vscode"
+  - id: "github-copilot-cli"
+missions:
+  - id: "root-inports-outports"
+    path: "missions/root-inports-outports/mission.yaml"
+  - id: "continuous-and-discrete-time"
+    path: "missions/continuous-and-discrete-time/mission.yaml"

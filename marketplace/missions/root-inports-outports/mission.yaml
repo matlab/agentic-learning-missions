@@ -1,0 +1,340 @@
+mission_id: "01"
+version: "1.0.0"
+title: Root Inports and Outports in Simulink
+objective: >
+  Learn to move data between the MATLAB workspace and a Simulink model using
+  root inports and outports. By the end you will have fed a noisy signal into a
+  model, filtered it, logged the result, and compared the filtered signal to the
+  original back in MATLAB. This mission assumes that you already know how to 
+  create a Simulink model, add and connect blocks, and set block parameters.
+supported_matlab_releases: [R2024b, R2025a, R2025b, R2026a, R2026b]
+required_capabilities: [MATLAB, Simulink, MATLAB MCP, Simulink Agentic Toolkit]
+write_mode: read_inspect
+capability_mode: guided_tutor
+
+app:
+  summary: Feed MATLAB workspace data through root ports, filter it, and compare the result.
+  audience: Beginner Simulink learners who know basic MATLAB plotting and variables.
+  difficulty: beginner
+  estimated_minutes: 60
+  products: [MATLAB, Simulink]
+  topics: [workspace data, root inports, root outports, filtering, simulation output]
+  status: published
+  learner_visible: true
+  tile_order: 10
+
+learning_outcomes:
+  - id: lo01
+    description: Inspect MATLAB workspace signal data before building a model.
+  - id: lo02
+    description: Configure a Simulink root inport to use workspace data.
+  - id: lo03
+    description: Build and run a simple Simulink signal path with root ports.
+  - id: lo04
+    description: Compare logged simulation output with original MATLAB data.
+
+setup:
+  script: "setup_root_inports_outports.m"
+  description: >
+    Generates a noisy respiratory signal and leaves respiratoryData in the
+    MATLAB workspace as a timeseries ready for a root inport. Intermediate
+    construction variables are cleared. Run via run_matlab_file at session
+    start.
+
+runtime_validation:
+  setup:
+    assertions:
+      - type: workspace_var
+        name: respiratoryData
+        class: timeseries
+      - type: workspace_absent
+        name: noisySignal
+  resets:
+    - task: t02
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: workspace_var
+          name: respiratoryData
+          class: timeseries
+    - task: t03
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: model_loaded
+          name: mission01
+        - type: block_exists
+          path: mission01/In1
+          block_type: Inport
+    - task: t04
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: model_loaded
+          name: mission01
+        - type: block_param
+          path: mission01
+          parameter: LoadExternalInput
+          equals: "on"
+        - type: block_param
+          path: mission01
+          parameter: ExternalInput
+          equals: respiratoryData
+        - type: block_param
+          path: mission01/In1
+          parameter: SampleTime
+          any_of: ["0.001", "1e-3"]
+    - task: t05
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: model_loaded
+          name: mission01
+        - type: block_exists
+          path: mission01/Scope
+          block_type: Scope
+        - type: line_source
+          path: mission01/Scope
+          source: In1
+        - type: matlab_expression
+          description: Simulation output exists
+          code: 'exist("out", "var") == 1 && isa(out, "Simulink.SimulationOutput")'
+    - task: t06
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: model_loaded
+          name: mission01
+        - type: block_exists
+          path: mission01/LowPass
+          block_type: TransferFcn
+        - type: block_param
+          path: mission01/LowPass
+          parameter: Denominator
+          equals: "[0.15 1]"
+        - type: block_exists
+          path: mission01/Out1
+          block_type: Outport
+        - type: line_source
+          path: mission01/LowPass
+          source: In1
+        - type: line_source
+          path: mission01/Out1
+          source: LowPass
+    - task: t07
+      assertions:
+        - type: figure_count
+          min_new_figures: 1
+        - type: model_loaded
+          name: mission01
+        - type: matlab_expression
+          description: Simulation output exists
+          code: 'exist("out", "var") == 1 && isa(out, "Simulink.SimulationOutput")'
+        - type: matlab_expression
+          description: Logged outport data exists
+          code: "~isempty(out.yout)"
+
+discovery:
+  model_name:
+    tool: evaluate_matlab_code
+    code: "bdroot"
+    note: >
+      The learner creates their own model. Use bdroot or
+      find_system('type','block_diagram') to discover its name.
+      Store the result and use it for all subsequent model_read /
+      model_query_params calls.
+
+# Notes for the tutor (Ada):
+# - completion.strategy names real MCP tools and describes what to check.
+#   The tutor interprets results using judgment — these are not brittle assertions.
+# - involves is a hint about the *kind* of task, so you frame guidance well.
+# - After t02 completes, run the discovery step to learn the model name.
+
+tasks:
+  - id: "t01"
+    title: Explore the noisy data
+    involves: [output_interpretation]
+    outcome_refs: [lo01]
+    instruction: >
+      There's a noisy dataset waiting in your MATLAB workspace as a variable.
+      Before we touch Simulink, get a feel for it: plot it in a figure window and
+      take a look at the shape of the signal and the noise riding on top of it. 
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: "workspace contains respiratoryData as a nonempty timeseries (use `whos` and inspect its Time and Data)"
+        - tool: evaluate_matlab_code
+          check: >
+            inspect every open figure and verify that at least one plotted series
+            contains the current respiratoryData values, with matching time values
+            when the plot exposes XData
+      description: >
+        A figure window is open showing a plot of the noisy data variable.
+    hints:
+      - Use the Workspace panel to identify the data that setup prepared for you.
+      - A timeseries keeps measurements and time together; inspect both before choosing how to visualize it.
+      - Run `plot(respiratoryData)` to plot the prepared timeseries.
+
+  - id: "t02"
+    title: Create a model input boundary
+    involves: [command, file_edit]
+    outcome_refs: [lo02]
+    instruction: >
+      Create a new Simulink model and add a root-level boundary where workspace
+      data can enter the model.
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: "a Simulink model is open (use `find_system('type','block_diagram')`)"
+        - tool: model_read
+          check: "model contains a root-level Inport block"
+      description: >
+        A Simulink model is open and contains at least one root-level Inport block.
+    hints:
+      - Start with a blank model, then think about where signals enter at its boundary.
+      - Use a root-level Inport block to create the model input boundary.
+      - Create a blank model, then add Simulink > Sources > In1 at the root level.
+
+  - id: "t03"
+    title: Connect the model input to your data
+    involves: [configuration]
+    outcome_refs: [lo02]
+    instruction: >
+      Open the Model Settings from the Modeling tab in the Simulink toolstrip.
+      In the Data Import/Export pane, set the Input data to use the prepared 
+      workspace data. Then inspect the timeseries data (respiratoryData) to
+      determine the data's sample rate. Set the Sample Time parameter on the Inport
+      to match this rate.
+
+    completion:
+      strategy:
+        - tool: model_query_params
+          check: >
+            the current model has external input loading enabled and its input
+            expression references respiratoryData
+        - tool: model_read
+          check: >
+            discover all root-level blocks by BlockType and identify the Inport
+            without assuming its name
+        - tool: model_query_params
+          check: >
+            the discovered root Inport's sample-time expression evaluates to the
+            interval in respiratoryData.Time; accept equivalent numeric or MATLAB
+            expressions rather than requiring the literal text 1e-3 or 0.001
+      description: >
+        The root inport is configured to draw its values from the respiratory
+        data variable, and the Inport block's sample time matches the 1000 Hz
+        data rate.
+    hints:
+      - Inspect consecutive values in respiratoryData.Time to find the sample interval, then configure the model boundary and external input to agree with the data.
+      - Set the Inport sample time in its Execution tab, then open Modeling > Model Settings and enable external input loading under Data Import/Export.
+      - In Data Import/Export, select Input and enter respiratoryData. Set the root Inport sample time to 0.001 seconds or an equivalent expression such as 1e-3.
+
+  - id: "t04"
+    title: Inspect the incoming signal in the model
+    involves: [file_edit, output_interpretation]
+    outcome_refs: [lo03]
+    instruction: >
+      Add a signal display to the model input, run the model, and compare the
+      displayed signal with the figure from the first task.
+    completion:
+      strategy:
+        - tool: model_read
+          check: >
+            the current model contains a time-based signal display connected
+            to the root Inport's output; accept a Scope or behaviorally
+            equivalent display
+        - tool: evaluate_matlab_code
+          check: >
+            simulation has completed — verify a SimulationOutput exists AND its
+            model source matches the current model
+            (use `out.getSimulationMetadata.ModelInfo.ModelName` matches bdroot)
+      description: >
+        A time-based signal display is connected to the inport and the model
+        has been run, showing the same signal as the original plot.
+    hints:
+      - A display sink lets you observe how a signal changes over time.
+      - A Scope block can display the signal while the model runs.
+      - Add Simulink > Sinks > Scope, connect the Inport output to it, and run the current model.
+
+  - id: "t05"
+    title: Filter and return the signal
+    involves: [file_edit]
+    outcome_refs: [lo03]
+    instruction: >
+      Add first-order low-pass behavior with a time constant of 0.15 seconds so
+      the model preserves the slow breathing waveform while attenuating the
+      high-frequency noise. Return the filtered result through a root Outport.
+    completion:
+      strategy:
+        - tool: model_read
+          check: >
+            the current model routes its root Inport through a filter
+            implementation to a root Outport; accept blocks, subsystems, or
+            equations that implement the requested behavior
+        - tool: evaluate_matlab_code
+          check: >
+            use non-destructive SimulationInput overrides with representative
+            slow and high-frequency inputs to verify the current model implements
+            first-order low-pass behavior with a 0.15-second time constant: the
+            slow component is substantially preserved, the high-frequency
+            component is attenuated, and the result reaches the root Outport;
+            do not pass based only on the presence of an expected block
+      description: >
+        A low-pass filter feeds an Outport block; signal path is inport -> filter -> outport.
+    hints:
+      - A first-order low-pass has the form 1/(tau*s + 1), and the output must continue to a root Outport.
+      - A Transfer Fcn block is one direct implementation; coefficient vectors represent descending powers of s.
+      - Add a Transfer Fcn with numerator [1] and denominator [0.3 1], then wire Inport -> Transfer Fcn -> Outport.
+
+  - id: "t06"
+    title: Inspect simulation results
+    involves: [command, output_interpretation]
+    outcome_refs: [lo03, lo04]
+    instruction: >
+      Run the model, find the resulting simulation output in the workspace, and
+      inspect its filtered signal in the Simulation Data Inspector. The default 
+      output variable name is `out`.
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: >
+            a SimulationOutput variable from the current model and most recent
+            simulation exists, and its output field contains nonempty root
+            Outport data
+        - tool: evaluate_matlab_code
+          check: >
+            the Simulation Data Inspector contains a current run whose signal
+            values match the filtered root-Outport values in the current model's
+            latest SimulationOutput, not merely any older run
+      description: >
+        The model has been run, outport data is logged in the SimulationOutput,
+        and the Simulation Data Inspector is open showing the filtered signal.
+    hints:
+      - A completed simulation creates a result object in the MATLAB workspace.
+      - Inspect the current SimulationOutput and its yout field, then open Simulation Data Inspector.
+      - Import the current out.yout data into Simulation Data Inspector and confirm the displayed values match the latest model result.
+
+  - id: "t07"
+    title: Compare the signal before and after filtering
+    involves: [command, output_interpretation]
+    outcome_refs: [lo04]
+    instruction: >
+      Compare the original workspace signal with the filtered simulation result
+      in one MATLAB figure, using labels that make the difference clear.
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: >
+            inspect all open figures, not only gcf, and find one figure with a
+            legend and plotted values that match both current respiratoryData
+            and the filtered timeseries from the current model's latest
+            SimulationOutput; compare actual time and data vectors rather than
+            expected amplitudes
+      description: >
+        A figure shows the original noisy signal and the filtered signal together
+        with a legend identifying each.
+    hints:
+      - Plot the original respiratory data as well as the filtered values from the Simulink model.
+      - The SimulationOutput stores root Outport data as a nested timeseries; inspect out.yout to locate its Values.
+      - Use `filteredValues = out.yout{1}.Values;`, plot respiratoryData and filteredValues in one figure with `hold on`, then add a legend identifying both traces.
