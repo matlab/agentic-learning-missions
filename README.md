@@ -57,7 +57,7 @@ To use this repository, you must have:
 # For Learners
 ## Start Your First Mission
 
-Install [`InteractiveMissions.mltbx`](https://github.com/matlab/interactive-missions/releases/latest/download/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
+Install [`InteractiveMissions.mltbx`](https://github.com/matlab/agentic-learning-missions/releases/download/v0.0.1/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
 
 **In the app**
 1. Pick a mission card.
