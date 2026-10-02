@@ -1,7 +1,7 @@
 {
     "defaultMarketplace": {
         "id": "mathworks-interactive-missions",
-        "sourceUrl": "https://github.com/mathworks/interactive-missions",
+        "sourceUrl": "https://github.com/matlab/agentic-learning-missions",
         "referenceType": "branch",
         "referenceName": "main"
     }
