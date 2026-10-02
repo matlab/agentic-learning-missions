@@ -38,7 +38,7 @@ function toolboxPath = buildToolbox(root, options)
     opts.ToolboxName = "Interactive Missions";
     setOption(opts, "PackageName", "InteractiveMissions");
     opts.ToolboxVersion = "0.0.1";
-    opts.AuthorName = "The MathWorks, Inc.";
+    opts.AuthorName = "Alisha Schor and Valentin Boutrouche";
     opts.AuthorCompany = "The MathWorks, Inc.";
     opts.Summary = "Hands-on MATLAB and Simulink learning missions with an agentic tutor.";
     opts.Description = "Hands-on MATLAB and Simulink learning missions with an agentic tutor.";
