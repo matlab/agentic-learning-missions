@@ -1,7 +1,7 @@
 schema_version: "2.0"
 id: "mathworks-interactive-missions"
 title: "MathWorks Interactive Missions"
-source_url: "https://github.com/mathworks/interactive-missions"
+source_url: "https://github.com/matlab/interactive-missions"
 content_version: "0.2.4"
 minimum_toolbox_version: "0.2.0"
 summary: >
