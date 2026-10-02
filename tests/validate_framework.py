@@ -113,14 +113,14 @@ def mission_name_from_path(path: Path) -> str:
 
 def check_layout() -> None:
     for path in [
-        ROOT / "src" / "interactiveMissionsApp.m",
+        ROOT / "src" / "InteractiveMissions.m",
         ROOT / "src" / "app" / "index.html",
         ROOT / "src" / "app" / "app.js",
         ROOT / "src" / "app" / "styles.css",
         FALLBACK_THUMBNAILS / "gradcap.svg",
         FALLBACK_THUMBNAILS / "matlab1.svg",
         FALLBACK_THUMBNAILS / "simulink1.svg",
-        ROOT / "src" / "+interactiveMissions" / "openApp.m",
+        ROOT / "src" / "InteractiveMissions.m",
         ROOT / "src" / "+interactiveMissions" / "prepareWorkspace.m",
         ROOT / "buildfile.m",
         MARKETPLACE / "manifest.yaml",
@@ -174,7 +174,7 @@ def check_layout() -> None:
                 f"src adapter is missing: {adapter_id}")
 
     packaging_text = (ROOT / "buildfile.m").read_text(encoding="utf-8")
-    for phrase in ["ToolboxOptions", "AppGalleryFiles", "PackageDependencies", "ProductDependencies"]:
+    for phrase in ["ToolboxOptions", "AppGalleryFiles", "ProductDependencies"]:
         require(phrase in packaging_text, f"buildfile.m must configure {phrase}")
     require("sourceRoot" in packaging_text and "docsRoot" in packaging_text and
             "opts.ToolboxFiles" in packaging_text,

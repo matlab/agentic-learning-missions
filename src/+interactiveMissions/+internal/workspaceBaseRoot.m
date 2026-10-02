@@ -26,7 +26,7 @@ end
 
 function result = isTemporaryPath(path)
     tempRoot = replace(string(tempdir()), "/", filesep);
-    result = startsWith(lower(string(path)), lower(tempRoot));
+    result = interactiveMissions.internal.isPathWithin(path, tempRoot);
 end
 
 function result = isGeneratedWorkspaceName(folderName)
@@ -38,8 +38,13 @@ function result = isPreparedWorkspace(path)
 end
 
 function result = isOldDefaultRoot(path)
-    path = lower(replace(string(path), "/", filesep));
-    oldLeaf = lower(fullfile("Documents", "InteractiveMissionsWorkspace"));
-    previousLeaf = lower(fullfile("Documents", "MATLAB", "interactive-mission"));
+    path = replace(string(path), "/", filesep);
+    oldLeaf = fullfile("Documents", "InteractiveMissionsWorkspace");
+    previousLeaf = fullfile("Documents", "MATLAB", "interactive-mission");
+    if ispc
+        path = lower(path);
+        oldLeaf = lower(oldLeaf);
+        previousLeaf = lower(previousLeaf);
+    end
     result = endsWith(path, oldLeaf) || endsWith(path, previousLeaf);
 end
