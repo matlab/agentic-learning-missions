@@ -105,6 +105,8 @@ Open the app catalog for the current mission inventory. The app registers the Ma
 
 ## Getting Started
 
+Install [`InteractiveMissions.mltbx`](https://github.com/matlab/agentic-learning-missions/releases/download/v0.0.1/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
+
 In MATLAB, create a new folder and navigate to it. Then run:
 
 ```matlab
