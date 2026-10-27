@@ -1,6 +1,9 @@
 # Interactive Missions in MATLAB and Simulink
 
-Interactive Missions is a **MATLAB toolbox** for learning MATLAB&reg; and Simulink&reg; through guided, hands-on missions. You choose a mission in the MATLAB app, the app prepares a safe workspace, and an agentic tutor named Ada guides you one step at a time.
+Interactive Missions is a **MATLAB toolbox** for learning MATLAB&reg; and Simulink&reg; through guided, hands-on "missions." A mission
+is simply a structured sequence of tasks to teach you a specific concept in MATLAB or Simulink. As you proceed through a mission, you
+can ask the tutor for hints or feedback. When you choose a mission in the MATLAB app, the app prepares a safe workspace, and an agentic 
+tutor named Ada guides you through it one step at a time.
 
 🧑‍🎓Want to jump in to learning right away? [Start your first mission](#start-your-first-mission)
 
