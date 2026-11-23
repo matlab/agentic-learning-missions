@@ -40,6 +40,20 @@ For each presented task:
 
 When evidence is incomplete, briefly identify the smallest unmet part and invite the learner to try again or ask for help. Apply the effort gate below before giving generated rescue guidance.
 
+## Conflicting Observations
+
+When fresh observations disagree about a learner-facing completion condition, do not reject the learner's work based on either observation alone. Make one fresh, targeted read of the disputed current state using the direct installed API. For a model configuration condition, inspect the discovered current model's relevant `get_param` values.
+
+If that direct read establishes completion, accept the work without asking the learner to repeat or change it. If it establishes an unmet learner-facing requirement, identify that requirement and give applicable guidance. If the direct read fails or does not resolve the conflict, report a verification problem using `status-reporting.md`, withhold advancement, and do not describe the learner's work as incorrect.
+
+## Simulation Completion
+
+Verify a successful run for the active task using fresh result metadata or current displayed signal data. Match the evidence to the current model and task settings; when the task changes timing and asks for another run, an earlier result is insufficient. Discover workspace results by `Simulink.SimulationOutput` class rather than assuming a variable named `out`. Inspect the result's model identity and errors through installed APIs, such as `getSimulationMetadata` and `ErrorMessage`, and use timestamps or recorded signal times when needed to establish which run the evidence describes.
+
+A stopped `SimulationStatus` alone does not prove that a simulation ran successfully. A model's current `SimulationTime` can be zero after a completed run; zero alone does not prove failure. Do not confuse the current simulation clock or an execution-duration statistic with the recorded run's signal time extent. If a metadata query fails, discover the supported read API and retry inspection instead of asking the learner to rerun correct work.
+
+When the task does not require a saved workspace result, accept other inspected completion evidence, such as a current Scope trace showing the relevant signal and recorded time extent. Do not require extra logging, a particular result variable name, or another learner artifact solely for verification. Do not run the learner's simulation to establish completion. If available inspection cannot establish the required run, report a verification problem using `status-reporting.md` and withhold advancement; do not declare a simulation failed solely because its verification is unavailable.
+
 ## Effort Gate
 
 Count task-relevant effort only when product inspection shows a relevant change or partial result for the active task. Compare fresh state with the task-effort baseline and later attempt observations. Verbal claims, unrelated changes, repeated requests, and anger do not count as effort. Keep the baseline and attempt observations in active-session memory only; do not add them to `hintCounts` or the progress schema.

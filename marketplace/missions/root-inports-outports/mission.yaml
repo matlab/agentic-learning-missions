@@ -41,7 +41,7 @@ setup:
     construction variables are cleared. Run via run_matlab_file at session
     start.
 
-runtime_validation:
+runtime_expectations:
   setup:
     assertions:
       - type: workspace_var
@@ -246,9 +246,11 @@ tasks:
             equivalent display
         - tool: evaluate_matlab_code
           check: >
-            simulation has completed — verify a SimulationOutput exists AND its
-            model source matches the current model
-            (use `out.getSimulationMetadata.ModelInfo.ModelName` matches bdroot)
+            a successful Simulink.SimulationOutput from the current model's
+            latest relevant run exists; discover result variables by class rather
+            than assuming out, and inspect model identity and errors using the
+            installed metadata APIs. Do not infer success from stopped status
+            or failure from SimulationTime equal to zero
       description: >
         A time-based signal display is connected to the inport and the model
         has been run, showing the same signal as the original plot.
@@ -285,7 +287,7 @@ tasks:
     hints:
       - A first-order low-pass has the form 1/(tau*s + 1), and the output must continue to a root Outport.
       - A Transfer Fcn block is one direct implementation; coefficient vectors represent descending powers of s.
-      - Add a Transfer Fcn with numerator [1] and denominator [0.3 1], then wire Inport -> Transfer Fcn -> Outport.
+      - Add a Transfer Fcn with numerator [1] and denominator [0.15 1], then wire Inport -> Transfer Fcn -> Outport.
 
   - id: "t06"
     title: Inspect simulation results

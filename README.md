@@ -60,7 +60,7 @@ To use this repository, you must have:
 # For Learners
 ## Start Your First Mission
 
-Install [`InteractiveMissions.mltbx`](https://github.com/matlab/agentic-learning-missions/releases/download/v0.0.1/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
+Install [`InteractiveMissions.mltbx`](https://github.com/matlab/interactive-missions/releases/latest/download/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
 
 **In the app**
 1. Pick a mission card.
@@ -108,8 +108,6 @@ Open the app catalog for the current mission inventory. The app registers the Ma
 
 ## Getting Started
 
-Install [`InteractiveMissions.mltbx`](https://github.com/matlab/agentic-learning-missions/releases/download/v0.0.1/InteractiveMissions.mltbx), then open **Interactive Missions** from the MATLAB Apps Gallery.
-
 In MATLAB, create a new folder and navigate to it. Then run:
 
 ```matlab
@@ -119,7 +117,10 @@ startMissionAuthoring()
 The command sets up a draft marketplace layout, copies author documentation and skills, and configures the supported agentic client selected in the Command Window. It can also create a first-mission brief. Set the `source_url` TODO in `marketplace/manifest.yaml` before publishing or registering the marketplace.
 
 Then, launch your agent from the newly created folder and use `create-tutor-mission` to begin authoring.
-## Authoring skills
+
+## Create and share missions
+
+### Authoring skills
 
 There are 3 skills to help you author missions:
 
@@ -129,9 +130,20 @@ There are 3 skills to help you author missions:
 
 You can create a mission based on just a topic and learning outcomes, a topic plus a list of tasks, or a fully written list of tasks and hints that you want to use verbatim. The `create-tutor-mission` skill will use the information you provide to create mission YAML with all of the required metadata.
 
-## Sharing your missions
+### Sharing your missions
 
 To share your missions, push the marketplace to a public or private Git repository. Learners can register an HTTPS, `ssh://`, or SCP-style SSH clone URL. HTTPS authentication uses the configured Git credential helper; SSH URLs use the configured SSH agent.
+
+## Skill and mission evaluations
+
+Two additional skills allow you to evaluate the behavior the tutor and missions.
+
+1. `simulate-mission-learner`: runs a given mission as expert, casual, and naive simulated learners. Provides an interative feedback report and actionable items for updating the mission. This skill is useful for all mission authors.
+2. `evaluate-tutor-skill`: for independent tutor behavior and teaching-quality evaluation. This skill is useful if you want to alter or refine the tutor behavior in a fork of this repository.
+
+The evaluation skills use a pinned Codex SDK runner and optional MATLAB MCP sessions. They can run independently or produce a combined report from fresh or saved runs. Start with the [tutor and mission evaluation workflows](docs/evaluation/README.md) for guidance on choosing a skill, preparing inputs, reading results, and giving feedback. See [evaluation skill usage](docs/3-skill-usage.md#evaluation-skills) for the author-workspace overview. Results retain their provisional qualification limits; evaluation does not automatically revise missions or tutor rules.
+
+
 # About this Repository
 
 - `src/docs/` contains learner-facing Help content, while `docs/` contains author, maintainer, and validation guidance.

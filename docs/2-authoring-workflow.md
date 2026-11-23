@@ -126,4 +126,4 @@ Use maintain-missions to check the mission framework after updating allowed MCP
 tools. Confirm the mission contract, skill guidance, and validators still agree.
 ```
 
-For day-to-day mission authoring, authors usually need `create-tutor-mission` and `qa-mission`. Use `maintain-missions` when you are caring for the mission set or framework itself.
+For day-to-day mission authoring, authors usually need `create-tutor-mission` and `qa-mission`. Use `maintain-missions` when you are caring for the mission set or framework itself. Optional `evaluate-tutor-skill` and `simulate-mission-learner` workflows assess tutor behavior and simulated learner outcomes independently. See [evaluation skill usage](3-skill-usage.md#evaluation-skills) for prerequisites, combined reports, and qualification limits.

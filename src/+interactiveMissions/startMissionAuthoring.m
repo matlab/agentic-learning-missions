@@ -296,10 +296,11 @@ function workspaceRoot = absolutePath(workspaceRoot)
         error("InteractiveMissions:InvalidWorkspace", ...
             "WorkspaceRoot must not contain parent-folder references.");
     end
-    if ~interactiveMissions.internal.isAbsolutePath(workspaceRoot)
+    if isempty(regexp(workspaceRoot, "^[A-Za-z]:[\\/]", "once")) && ~startsWith(workspaceRoot, filesep)
         workspaceRoot = fullfile(pwd(), workspaceRoot);
     end
     workspaceRoot = replace(workspaceRoot, "/", filesep);
+    workspaceRoot = regexprep(workspaceRoot, "[" + regexptranslate("escape", filesep) + "]+", filesep);
 end
 
 function writeManifest(manifestPath, marketplaceId, marketplaceTitle, sourceUrl, records)
@@ -340,7 +341,8 @@ function writeAgentAdapter(workspaceRoot, adaptersRoot, portableSkillsRoot, agen
     end
 
     if agentClient == "codex"
-        skillNames = ["create-tutor-mission", "qa-mission", "maintain-missions"];
+        skillNames = ["create-tutor-mission", "qa-mission", "maintain-missions", ...
+            "evaluate-tutor-skill", "simulate-mission-learner"];
         for skillName = skillNames
             sourceRoot = fullfile(portableSkillsRoot, skillName);
             targetRoot = fullfile(workspaceRoot, ".codex", "skills", skillName);
@@ -388,6 +390,10 @@ function copyTree(sourceRoot, targetRoot)
     for fileIndex = 1:numel(files)
         sourcePath = fullfile(files(fileIndex).folder, files(fileIndex).name);
         relativePath = erase(string(sourcePath), string(sourceRoot) + filesep);
+        if any(split(relativePath, filesep) == "__pycache__") || ...
+                endsWith(relativePath, [".pyc", ".pyo"])
+            continue
+        end
         targetPath = fullfile(targetRoot, relativePath);
         targetFolder = fileparts(targetPath);
         createFolder(targetFolder);
@@ -414,7 +420,7 @@ end
 
 function validateRelativePath(path)
     path = string(path);
-    if contains(path, "..") || interactiveMissions.internal.isAbsolutePath(path)
+    if contains(path, "..") || startsWith(path, filesep) || ~isempty(regexp(path, "^[A-Za-z]:[\\/]", "once"))
         error("InteractiveMissions:UnsafePath", "Unsafe adapter path: %s", path);
     end
 end

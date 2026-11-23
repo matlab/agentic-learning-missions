@@ -92,7 +92,7 @@ Apply fixes that preserve your intent. For subjective findings, decide whether t
 
 A mission should feel like a focused hands-on lab. It does not need to explain all theory up front. It should give learners enough context to act, then help them inspect the result.
 
-Mission 02 is a useful example of a compact mission. It teaches continuous and discrete time through a direct sequence of model-building and comparison tasks. Mission 01 is a fuller example with setup data, runtime validation metadata, and a longer workflow.
+Mission 02 is a useful example of a compact mission. It teaches continuous and discrete time through a direct sequence of model-building and comparison tasks. Mission 01 is a fuller example with setup data, runtime expectations metadata, and a longer workflow.
 
 When the mission is ready, installed toolbox users keep the authored content in
 an authoring workspace, then publish it through marketplace content. Repository

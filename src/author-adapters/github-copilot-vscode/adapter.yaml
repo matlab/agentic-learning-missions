@@ -10,3 +10,7 @@ files:
     target: ".github/prompts/qa-mission.prompt.md"
   - source: "maintain-missions.prompt.md"
     target: ".github/prompts/maintain-missions.prompt.md"
+  - source: "evaluate-tutor-skill.prompt.md"
+    target: ".github/prompts/evaluate-tutor-skill.prompt.md"
+  - source: "simulate-mission-learner.prompt.md"
+    target: ".github/prompts/simulate-mission-learner.prompt.md"

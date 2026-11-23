@@ -39,7 +39,7 @@ end
 function root = defaultRoot()
     candidate = string(pwd());
     while strlength(candidate) > 0
-        if isfile(fullfile(candidate, "src", "InteractiveMissions.m")) && ...
+        if isfile(fullfile(candidate, "src", "interactiveMissionsApp.m")) && ...
                 isfile(fullfile(candidate, "marketplace", "missions", ...
                 "root-inports-outports", "mission.yaml"))
             root = candidate;
@@ -223,7 +223,7 @@ function mission = readMissionDefinition(missionPath, root)
     mission.Path = missionPath;
     mission.TaskIds = taskIds;
     mission.SetupScript = missionSetupScript(text);
-    mission.Validation = parseRuntimeValidation(text, taskIds, rel(missionPath, root));
+    mission.Validation = parseRuntimeExpectations(text, taskIds, rel(missionPath, root));
 end
 
 function missionName = missionNameFromPath(path, root)
@@ -272,21 +272,21 @@ function taskIds = missionTaskIds(missionPath)
     end
 end
 
-function validation = parseRuntimeValidation(text, taskIds, sourceLabel)
+function validation = parseRuntimeExpectations(text, taskIds, sourceLabel)
     validation = struct();
     validation.SetupAssertions = emptyAssertions();
     validation.ResetTasks = strings(0, 1);
     validation.ResetAssertions = cell(0, 1);
 
     lines = splitlines(text);
-    validationBlock = topBlockLines(lines, "runtime_validation");
+    validationBlock = topBlockLines(lines, "runtime_expectations");
     if isempty(validationBlock)
         return
     end
 
     setupBlock = childBlockLines(validationBlock, "setup");
     if ~isempty(setupBlock)
-        validation.SetupAssertions = parseAssertionsFromParent(setupBlock, sourceLabel + " runtime_validation.setup");
+        validation.SetupAssertions = parseAssertionsFromParent(setupBlock, sourceLabel + " runtime_expectations.setup");
     end
 
     resetBlock = childBlockLines(validationBlock, "resets");
@@ -297,18 +297,18 @@ end
 
 function [resetTasks, resetAssertions] = parseResetAssertions(resetBlock, taskIds, sourceLabel)
     starts = find(startsWith(strtrim(resetBlock), "- task:"));
-    require(~isempty(starts), sourceLabel + " runtime_validation.resets must list reset tasks");
+    require(~isempty(starts), sourceLabel + " runtime_expectations.resets must list reset tasks");
 
     resetTasks = strings(numel(starts), 1);
     resetAssertions = cell(numel(starts), 1);
     for k = 1:numel(starts)
         chunk = listItemChunk(resetBlock, starts, k);
         taskId = parseYamlScalar(extractAfter(strtrim(chunk(1)), "- task:"));
-        require(any(taskIds == taskId), sourceLabel + " runtime_validation references unknown task " + taskId);
-        require(~any(resetTasks(1:k - 1) == taskId), sourceLabel + " runtime_validation repeats task " + taskId);
+        require(any(taskIds == taskId), sourceLabel + " runtime_expectations references unknown task " + taskId);
+        require(~any(resetTasks(1:k - 1) == taskId), sourceLabel + " runtime_expectations repeats task " + taskId);
         resetTasks(k) = taskId;
         resetAssertions{k} = parseAssertionsFromParent(chunk, ...
-            sourceLabel + " runtime_validation.resets." + taskId);
+            sourceLabel + " runtime_expectations.resets." + taskId);
     end
 end
 

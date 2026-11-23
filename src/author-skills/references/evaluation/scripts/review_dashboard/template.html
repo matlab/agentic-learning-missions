@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Calibration review · Interactive Missions</title>
+  <style>/* REVIEW_STYLE */</style>
+</head>
+<body>
+  <a class="skip" href="#review-content">Skip to review</a>
+  <header class="masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">IM</span> INTERACTIVE MISSIONS <span class="divider">/</span> AUTHOR WORKSPACE</div>
+    <div class="heading-row"><div><div class="eyebrow">MILESTONE 4 <span id="round-title">AUTHOR CALIBRATION</span></div><h1 id="hero-title">Review the evaluator.</h1><p id="hero-description">Check the evidence. Shape the tests. Tell us what should change.</p></div><div class="draft-tag">Provisional · awaiting your review</div></div>
+  </header>
+  <div class="workspace">
+    <section class="start-card" aria-labelledby="start-title">
+      <div><h2 id="start-title">How to give feedback</h2><p><strong>1. Read</strong> the proposal and its evidence. <strong>2. Decide</strong> or leave a question. <strong>3. Export</strong> your feedback for the agent. Partial reviews are welcome.</p><p id="review-scope" class="small">Decisions stay separate from the original grades. Nothing is approved by default.</p></div>
+      <div class="export-actions"><button id="export-json" class="primary">Export feedback JSON</button><div class="secondary-actions"><button id="export-md">Export readable notes</button><button id="import">Import feedback</button></div><input id="import-file" type="file" accept=".json,application/json" hidden></div>
+    </section>
+    <section class="review-meta" aria-label="Review progress">
+      <div class="progress-block"><div><strong id="progress-label">0 of __REVIEW_COUNT__ reviewed</strong><span id="pending-label">__REVIEW_COUNT__ to review</span></div><progress id="progress" max="__REVIEW_COUNT__" value="0">0 of __REVIEW_COUNT__</progress></div>
+      <label class="reviewer">Your name <span>(optional)</span><input id="reviewer" maxlength="200" placeholder="Reviewer name" autocomplete="name"></label>
+      <div class="save-status"><span id="storage-status" role="status">Draft saves in this browser</span><button id="undo-import" hidden>Undo import</button></div>
+    </section>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
+    <div class="layout">
+      <aside class="sidebar" aria-label="Review navigation">
+        <h2>Review queue</h2>
+        <div id="groups" class="groups"></div>
+        <label class="search-label" for="search">Find an item</label><input id="search" type="search" placeholder="Search this section…">
+        <label class="filter"><input type="checkbox" id="pending-only"> Only items needing a decision</label>
+        <nav id="item-list" aria-label="Items in this section"></nav>
+        <div class="legend"><span class="dot" aria-hidden="true"></span> A filled marker means you recorded a decision, not that you approved it.</div>
+      </aside>
+      <main id="review-content" tabindex="-1">
+        <div class="section-heading"><div><p id="section-kicker" class="eyebrow"></p><h2 id="section-title"></h2><p id="section-help"></p></div><button id="next-pending">Next unreviewed →</button></div>
+        <div id="item-content"></div>
+      </main>
+    </div>
+    <section class="overall" aria-labelledby="overall-title"><div><h2 id="overall-title">Any overall feedback?</h2><p>Use this for a grading principle, missing evidence, or feedback that applies to the whole review.</p></div><label class="sr-only" for="overall-notes">Overall feedback</label><textarea id="overall-notes" rows="3" maxlength="20000" placeholder="For example: distinguish changes caused by the tutor from changes caused by the independent checker."></textarea></section>
+    <footer><p><strong>To hand off:</strong> export the JSON and save it under <code>L:\interactive-missions\build\evaluations</code>. Tell the agent the file name. Browser drafts are local; exporting does not send or apply them.</p><p>No mission or tutor changes are made here. Reviewing these proposals does not qualify a release or approve every historical result.</p><details><summary>Full review packet and provenance</summary><p id="packet-id"></p><pre id="source-document"></pre></details></footer>
+  </div>
+  <script id="review-data" type="application/json">__REVIEW_DATA__</script>
+  <script>/* REVIEW_APP */</script>
+</body>
+</html>

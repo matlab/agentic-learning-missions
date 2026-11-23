@@ -291,7 +291,7 @@ function path = resolveMissionPath(missionPath, relativePath)
     if strlength(strtrim(path)) == 0
         return
     end
-    if ~interactiveMissions.internal.isAbsolutePath(path)
+    if isempty(regexp(path, "^[A-Za-z]:[\\/]", "once")) && ~startsWith(path, filesep)
         missionFolder = string(fileparts(missionPath));
         candidatePath = fullfile(missionFolder, path);
         if isfile(candidatePath)

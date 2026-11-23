@@ -25,13 +25,28 @@ Use `kind: learner_confirmation` instead of `tool` only when the finished state
 is a learner choice or reflection that should stay in chat rather than become a
 required workspace file.
 
+## High-Risk Task Verification Design
+
+Before drafting a completion strategy for a task that depends on a simulation result, figure, Simulation Data Inspector signal, or direct model configuration, record these six design decisions:
+
+| Decision | Author question |
+| --- | --- |
+| Learner-facing claim | What outcome does the instruction ask the learner to achieve? |
+| Authoritative state | Which current model, result, figure, or SDI signal can establish that outcome? |
+| Binding | How will inspection show that the evidence belongs to the learner's current model or artifact? |
+| Freshness | What makes the observation current for this task instead of setup output, a prior task, or cached state? |
+| Positive and negative evidence | What proves success, and what proves an unmet requirement or failed run? |
+| Unverified fallback | What should the tutor say when inspection is stale, unavailable, or conflicting? |
+
+Do not use a variable name, an active figure, a stopped simulation status, or cached output as sufficient evidence by itself. A simulation result must belong to the learner's current model. A figure check must inspect the task-owned figure and plotted content. An SDI check must inspect the required selected signal and its data. A configuration check must read the current parameter value. When direct current evidence conflicts with cached evidence, use the direct evidence. When no current evidence is available, keep the task pending and explain that verification is unavailable without calling the learner's work wrong.
+
 ## Common Completion-Check Mapping
 
 | Intent | Tool | How to check |
 | --- | --- | --- |
 | Workspace variables exist | evaluate_matlab_code | `whos` or `exist(varname,"var")` |
-| Figure is open | evaluate_matlab_code | `get(groot,"Children")` |
-| Figure has plotted data | evaluate_matlab_code | `findobj(gcf,"Type","line")` |
+| Figure is open | evaluate_matlab_code | Find task-owned figures through `get(groot,"Children")`; do not rely on `gcf` alone |
+| Figure has plotted data | evaluate_matlab_code | Inspect lines in the identified task-owned figure, not only the active figure |
 | Figure has N data series | evaluate_matlab_code | `numel(findobj(gcf,"Type","line"))` |
 | Discover open models | evaluate_matlab_code | `find_system("type","block_diagram")` or `bdroot` |
 | Model contains block type | model_read | Read root scope, depth 0; look for block type |
@@ -48,7 +63,7 @@ required workspace file.
 | MATLAB test execution | run_matlab_test_file | run a MATLAB test file when the task goal requires it |
 | Toolbox discovery | detect_matlab_toolboxes | detect required installed products or toolboxes |
 | Model edits | model_edit | verify or describe structural edits only when the mission explicitly allows tool-assisted model modification |
-| Simulation has run | evaluate_matlab_code | `get_param(mdl,"SimulationStatus")` or check logged output exists |
+| Simulation has run | evaluate_matlab_code | Confirm a successful current result belongs to the learner's model; stopped status or a result variable name alone is insufficient |
 | Learner choice or reflection | learner_confirmation | ask the learner to state the choice or reflection in chat |
 
 ## Mission YAML Template
@@ -80,6 +95,18 @@ setup:
   script: "setup_<mission_name>.m"
   description: >
     <What the script prepares in the workspace and why>
+
+# Optional: verify setup and reset states with tests/validate_runtime.m.
+runtime_expectations:
+  setup:
+    assertions:
+      - type: workspace_var
+        name: <prepared_variable>
+  resets:
+    - task: t02
+      assertions:
+        - type: model_loaded
+          name: <prepared_model>
 
 discovery:
   model_name:
@@ -132,6 +159,7 @@ prescribe a model name when the learner creates the model.
 | `write_mode` | Required static classification: `read_inspect` or `allow_agent_edits` | Validators and catalog |
 | `capability_mode` | Required workflow classification: `guided_tutor`, `agent_build`, or `review_only` | Validators and catalog |
 | `allow_agent_edits` | Optional runtime permission; defaults to `false` | Workspace preparation and learner tutor |
+| `runtime_expectations` | Optional expected setup/reset state for runtime tests | `tests/validate_runtime.m` |
 
 ## Learning Outcome Rules
 
@@ -161,6 +189,10 @@ After creating or revising the mission YAML:
 - [ ] Hints form a directional-to-specific-to-direct ladder and are not duplicated, contradictory, misleading, or technically inaccurate.
 - [ ] Commands, UI paths, exact values, library paths, and wiring recipes appear only in later hints where their disclosure level is appropriate.
 - [ ] Completion checks accept behaviorally equivalent solutions unless the instruction explicitly requires a particular implementation, and every check uses current observable state.
+- [ ] Each high-risk task records its learner-facing claim, authoritative state, model or artifact binding, freshness evidence, positive and negative evidence, and unverified fallback.
+- [ ] Simulation, figure, SDI, and configuration checks do not rely only on a result variable name, active figure, stopped status, or cached observation.
+- [ ] Learner-visible names, values, and behavior agree across instructions, hints, completion checks, setup/reset scripts, and `runtime_expectations`.
+- [ ] `runtime_expectations`, when present, assert only learner-relevant task-start state rather than incidental UI state such as autoscaled Scope axes.
 - [ ] The `discovery` section is present if any task uses model-specific tools that need a model name.
 - [ ] Learning outcomes, when present, use stable `loNN` IDs and are referenced by task `outcome_refs`.
 - [ ] Any "articulate" or "explain" learning outcome is explicitly practiced or checked by a task.

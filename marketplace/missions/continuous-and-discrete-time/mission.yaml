@@ -67,8 +67,11 @@ tasks:
             the Sine Wave source is configured for continuous-time output
         - tool: evaluate_matlab_code
           check: >
-            simulation has completed for the current model; verify the model is
-            not still running and no blocking simulation error is present.
+            a successful current-model run for this task is evidenced by result
+            metadata or current displayed signal data, with no blocking simulation
+            error; do not infer success from stopped status or failure from
+            SimulationTime equal to zero, and do not require a particular result
+            variable name or additional logging
       description: >
         A model is open with a continuous-time Sine Wave connected to a display.
     hints:
@@ -95,8 +98,12 @@ tasks:
             the Sine Wave source has a positive finite sample interval
         - tool: evaluate_matlab_code
           check: >
-            simulation has completed for the current model; verify the model is
-            not still running and no blocking simulation error is present.
+            a successful current-model run after this task's source-timing change
+            is evidenced by result metadata or current displayed signal data,
+            with no blocking simulation error; an earlier run is insufficient.
+            Do not infer success from stopped status or failure from SimulationTime
+            equal to zero, and do not require a particular result variable name
+            or additional logging
       description: >
         The model runs with the Sine Wave configured as a discrete-time source.
     hints:
@@ -129,8 +136,12 @@ tasks:
             between updates; do not require a specific sampling-stage block type
         - tool: evaluate_matlab_code
           check: >
-            simulation has completed for the current model; verify the model is
-            not still running and no blocking simulation error is present.
+            a successful current-model run after this task's timing and sampling
+            changes is evidenced by result metadata or current displayed signal
+            data, with no blocking simulation error; an earlier run is insufficient.
+            Do not infer success from stopped status or failure from SimulationTime
+            equal to zero, and do not require a particular result variable name
+            or additional logging
       description: >
         The model now has a discrete-time sampled version of the continuous
         Sine Wave signal.

@@ -94,6 +94,18 @@ Check that:
 - The check accepts behaviorally equivalent implementations whenever the instruction is outcome-oriented.
 - The check inspects current task state rather than stale workspace results, an incidental active figure, or a previous simulation.
 
+## High-Risk Verification Evidence
+
+For tasks involving simulation results, figures, Simulation Data Inspector, or direct model configuration, require a verification design that identifies the learner-facing claim, authoritative current state, learner model or artifact binding, freshness evidence, positive and negative evidence, and unverified fallback.
+
+Flag a check that treats a result variable name, active figure, stopped model, or cached observation as sufficient by itself. A simulation result must belong to the learner's current model. A figure check must identify the task-owned figure and its content. An SDI check must identify the required selected signal and matching data. A configuration check must read current parameter state. When the evidence is stale, unavailable, or conflicting, the task must remain unverified instead of rejecting the learner's work.
+
+## Runtime Expectations Traceability
+
+When `runtime_expectations` is present, compare each expectation with the related setup or reset script, learner instruction, hints, and completion checks. Flag a learner-visible variable name, exact value, parameter, model path, or required behavior that conflicts across those artifacts.
+
+Expectations should assert task-start state that matters to the learner. Flag autoscaled Scope limits, window positions, current figure selection, and other incidental presentation state unless the task explicitly teaches that setting. `runtime_expectations` validates setup and reset behavior; it does not replace completion checks or impose hidden learner requirements.
+
 ## Agent Edit Permission Fit
 
 Check `allow_agent_edits` against the mission tasks:

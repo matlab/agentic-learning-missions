@@ -40,7 +40,8 @@ ALLOWED_MCP_TOOLS = {
     "run_matlab_test_file",
 }
 ALLOWED_COMPLETION_KINDS = {"learner_confirmation"}
-AUTHOR_ONLY_SKILLS = {"create-tutor-mission", "qa-mission", "maintain-missions"}
+AUTHOR_ONLY_SKILLS = {"create-tutor-mission", "qa-mission", "maintain-missions",
+                     "evaluate-tutor-skill", "simulate-mission-learner"}
 SUPPORTED_ADAPTER_IDS = {
     "codex",
     "claude-code",
@@ -113,14 +114,14 @@ def mission_name_from_path(path: Path) -> str:
 
 def check_layout() -> None:
     for path in [
-        ROOT / "src" / "InteractiveMissions.m",
+        ROOT / "src" / "interactiveMissionsApp.m",
         ROOT / "src" / "app" / "index.html",
         ROOT / "src" / "app" / "app.js",
         ROOT / "src" / "app" / "styles.css",
         FALLBACK_THUMBNAILS / "gradcap.svg",
         FALLBACK_THUMBNAILS / "matlab1.svg",
         FALLBACK_THUMBNAILS / "simulink1.svg",
-        ROOT / "src" / "InteractiveMissions.m",
+        ROOT / "src" / "+interactiveMissions" / "openApp.m",
         ROOT / "src" / "+interactiveMissions" / "prepareWorkspace.m",
         ROOT / "buildfile.m",
         MARKETPLACE / "manifest.yaml",
@@ -174,10 +175,10 @@ def check_layout() -> None:
                 f"src adapter is missing: {adapter_id}")
 
     packaging_text = (ROOT / "buildfile.m").read_text(encoding="utf-8")
-    for phrase in ["ToolboxOptions", "AppGalleryFiles", "ProductDependencies"]:
+    for phrase in ["ToolboxOptions", "AppGalleryFiles", "PackageDependencies", "ProductDependencies"]:
         require(phrase in packaging_text, f"buildfile.m must configure {phrase}")
     require("sourceRoot" in packaging_text and "docsRoot" in packaging_text and
-            "opts.ToolboxFiles" in packaging_text,
+            "ToolboxFiles=toolboxFiles" in packaging_text,
             "buildfile.m must package learner and author documentation with the toolbox")
 
     buildfile_text = packaging_text
@@ -211,6 +212,7 @@ def check_missions() -> None:
         check_thumbnail(mission_path, mission)
         check_app_metadata(mission_path, mission["app"])
         check_tasks(mission_path, mission["tasks"])
+        check_runtime_expectations(mission_path, mission)
 
         setup = mission.get("setup")
         if setup is not None:
@@ -228,6 +230,42 @@ def check_missions() -> None:
 
         if mission_name == "continuous-and-discrete-time":
             check_continuous_and_discrete_time_source_contract(mission_path, mission)
+
+
+def check_runtime_expectations(mission_path: Path, mission: dict) -> None:
+    require("runtime_validation" not in mission,
+            f"{rel(mission_path)} uses retired field runtime_validation; use runtime_expectations")
+    expectations = mission.get("runtime_expectations")
+    if expectations is None:
+        return
+
+    require(isinstance(expectations, dict),
+            f"{rel(mission_path)} runtime_expectations must be a mapping")
+    require(set(expectations).issubset({"setup", "resets"}),
+            f"{rel(mission_path)} runtime_expectations supports only setup and resets")
+
+    task_ids = {task["id"] for task in mission["tasks"]}
+    setup = expectations.get("setup")
+    if setup is not None:
+        require(isinstance(setup, dict) and isinstance(setup.get("assertions"), list) and setup["assertions"],
+                f"{rel(mission_path)} runtime_expectations.setup must declare assertions")
+
+    resets = expectations.get("resets")
+    if resets is not None:
+        require(isinstance(resets, list) and resets,
+                f"{rel(mission_path)} runtime_expectations.resets must be a non-empty list")
+        reset_tasks = set()
+        for entry in resets:
+            require(isinstance(entry, dict),
+                    f"{rel(mission_path)} runtime_expectations reset entries must be mappings")
+            task_id = entry.get("task")
+            require(task_id in task_ids,
+                    f"{rel(mission_path)} runtime_expectations references unknown task {task_id!r}")
+            require(task_id not in reset_tasks,
+                    f"{rel(mission_path)} runtime_expectations repeats task {task_id}")
+            require(isinstance(entry.get("assertions"), list) and entry["assertions"],
+                    f"{rel(mission_path)} runtime_expectations.{task_id} must declare assertions")
+            reset_tasks.add(task_id)
 
 
 def check_continuous_and_discrete_time_source_contract(mission_path: Path, mission: dict) -> None:
@@ -460,8 +498,8 @@ def check_docs_and_skills() -> None:
             "task loop must exclude the organizer prediction from task attempts")
     require("mcpTmp_" in tutor_text,
             "tutor skill must require the mcpTmp_ temporary-variable prefix")
-    require("Prefer direct expressions and `fprintf` for MATLAB MCP inspection" in tutor_text,
-            "tutor skill must prefer inspections without temporary variables")
+    require("Print MATLAB inspection values with `fprintf` or `disp`" in tutor_text,
+            "tutor skill must print inspection values without unassigned returns")
     require('mcpTmpNames = who("mcpTmp_*");' in task_loop_text,
             "task loop must identify mcpTmp_ temporary variables for cleanup")
     require("clear(mcpTmpNames{:})" in task_loop_text,
@@ -534,12 +572,34 @@ def check_docs_and_skills() -> None:
     contract = (SHARED_AUTHOR_REFERENCES / "mission-contract.md").read_text(encoding="utf-8")
     authoring_instructions = (PACKAGED_AUTHOR_SKILLS / "create-tutor-mission" / "SKILL.md").read_text(encoding="utf-8")
     yaml_guidance = (PACKAGED_AUTHOR_SKILLS / "create-tutor-mission" / "references" / "mission-yaml.md").read_text(encoding="utf-8")
+    qa_instructions = (PACKAGED_AUTHOR_SKILLS / "qa-mission" / "SKILL.md").read_text(encoding="utf-8")
     qa_guidance = (PACKAGED_AUTHOR_SKILLS / "qa-mission" / "references" / "static-analysis.md").read_text(encoding="utf-8")
+    qa_report_format = (PACKAGED_AUTHOR_SKILLS / "qa-mission" / "references" / "report-format.md").read_text(encoding="utf-8")
+    maintenance_instructions = (PACKAGED_AUTHOR_SKILLS / "maintain-missions" / "SKILL.md").read_text(encoding="utf-8")
     overview = (ROOT / "docs" / "4-mission-yaml-overview.md").read_text(encoding="utf-8")
     for text, label in [(contract, "mission contract"), (authoring_instructions, "mission-authoring instructions"), (yaml_guidance, "mission YAML guidance"), (qa_guidance, "QA guidance"), (overview, "mission YAML overview")]:
         require("prediction" in text.lower(), f"{label} must describe organizer-ready objectives")
         require("prerequisite" in text.lower() or "prior knowledge" in text.lower(),
                 f"{label} must explain how organizer-ready objectives express prerequisites")
+    for text, label in [
+        (authoring_instructions, "mission-authoring instructions"),
+        (yaml_guidance, "mission YAML guidance"),
+        (qa_instructions, "QA instructions"),
+        (qa_guidance, "QA guidance"),
+        (qa_report_format, "QA report format"),
+        (maintenance_instructions, "maintenance instructions"),
+    ]:
+        require("unverified" in text.lower(), f"{label} must distinguish unverified work")
+        require("Simulation Data Inspector" in text,
+                f"{label} must cover high-risk verification evidence")
+    require("verification design" in authoring_instructions.lower() and
+            "verification design" in yaml_guidance.lower(),
+            "mission authoring must require a high-risk verification design")
+    require("verification evidence table" in qa_instructions.lower() and
+            "Verification evidence" in qa_report_format,
+            "mission QA must report high-risk verification evidence")
+    require("one correct case, one genuinely incorrect case, and one unavailable or conflicting-inspection case" in maintenance_instructions,
+            "maintenance guidance must require focused verification regression coverage")
 
     app_html = (ROOT / "src" / "app" / "index.html").read_text(encoding="utf-8")
     app_js = (ROOT / "src" / "app" / "app.js").read_text(encoding="utf-8")
@@ -689,17 +749,17 @@ def check_docs_and_skills() -> None:
     unregister_marketplace = (ROOT / "src" / "+interactiveMissions" / "unregisterMarketplace.m").read_text(encoding="utf-8")
     marketplace_update_check = (ROOT / "src" / "+interactiveMissions" / "checkMarketplaceUpdates.m").read_text(encoding="utf-8")
     default_marketplace_settings = (ROOT / "src" / "app" / "setting.json").read_text(encoding="utf-8")
-    internal_gitlab_url = "insidelabs-git.mathworks.com"
-    require(internal_gitlab_url not in readme.lower() + default_marketplace_settings.lower(),
-            "public release files must not contain internal GitLab URLs")
     require('id="registerMarketplaceModal"' in app_html and
             'id="marketplaceVisibilitySelect"' not in app_html and "Git Credential Manager" in app_html,
             "app must use a credential-aware marketplace registration modal")
     require("setting.json" in default_marketplace and
             '"referenceName": "main"' in default_marketplace_settings and
+            any(url in default_marketplace_settings for url in [
+                "insidelabs-git.mathworks.com/agentic-experimental/interactive-missions",
+                "github.com/mathworks/interactive-missions"]) and
             "IsDefault=true" in default_registration and
             "DefaultMarketplaceProtected" in unregister_marketplace,
-            "app must register and protect the default marketplace")
+            "app must register and protect the integration-branch default marketplace")
     app_class = (ROOT / "src" / "+interactiveMissions" / "+internal" / "MissionBrowserApp.m").read_text(encoding="utf-8")
     startup_update_check = app_class.split("function checkForUpdatesAfterStartup", 1)[1].split("function clearMissionCache", 1)[0]
     require("checkMarketplaceUpdates" in marketplace_update_check and
@@ -730,8 +790,8 @@ def check_docs_and_skills() -> None:
 
 def check_progress_safety() -> None:
     gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
-    require(not re.search(r"(?m)^progress/$", gitignore), ".gitignore must not ignore progress/")
-    require(not re.search(r"(?m)^build/$", gitignore), ".gitignore must not ignore build/")
+    require(re.search(r"(?m)^progress/$", gitignore), ".gitignore must ignore progress/")
+    require(re.search(r"(?m)^build/$", gitignore), ".gitignore must ignore build/")
     tracked_progress = git_ls_files("progress")
     require(not tracked_progress, "progress files must not be tracked: " + ", ".join(tracked_progress))
 

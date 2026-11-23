@@ -21,8 +21,9 @@
 # Deployable archives
 *.ctf
 
-# Generated helpsearch folders
+# Generated helpsearch or playwright folders
 helpsearch*/
+.playwright-mcp/
 
 # Code generation folders
 slprj/
@@ -35,3 +36,12 @@ codegen/
 # Cloud based storage dotfile
 .MATLABDriveTag
 
+# Ignore progress, build artifacts, personal config
+
+__pycache__/
+*.py[cod]
+progress/
+build/
+.obsidian/
+
+# Installers are verified registry assets, never future source commits.

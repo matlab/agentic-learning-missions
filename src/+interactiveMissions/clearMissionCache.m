@@ -16,7 +16,7 @@ function clearMissionCache(options)
             "The selected mission is not available in a marketplace cache.");
     end
 
-    if ~interactiveMissions.internal.isPathWithin(marketplaceRoot, cacheRoot)
+    if ~startsWith(lower(marketplaceRoot), lower(cacheRoot + filesep))
         error("InteractiveMissions:UnsafeCachePath", ...
             "The selected mission does not belong to the toolbox-managed marketplace cache.");
     end

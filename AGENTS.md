@@ -10,6 +10,7 @@ MATLAB Apps Gallery launcher, authoring skills, and smoke tests.
 - Use `qa-mission` when the user wants to review mission quality.
 - Use `maintain-missions` when the user wants framework cleanup, packaging
   checks, docs maintenance, or smoke-test updates.
+- Use `evaluate-tutor-skill` for independent tutor behavior evaluation and `simulate-mission-learner` for mission evaluation specifications or simulated learner runs. Both use the shared Codex evaluation runner; combined execution is optional.
 - If the user wants to run a learner mission from this checkout, use
   `interactiveMissions.prepareWorkspace` to create a safe workspace bundle and
   invoke the copied `mission-tutoring` skill from that workspace.
@@ -35,6 +36,8 @@ MATLAB Apps Gallery launcher, authoring skills, and smoke tests.
 - `qa-mission` - authoring skill for mission quality review.
 - `maintain-missions` - maintainer skill for layout, packaging, docs, and smoke
   test upkeep.
+- `evaluate-tutor-skill` - author-only wrapper for tutor behavior and teaching-quality evaluation.
+- `simulate-mission-learner` - author-only wrapper for mission specifications, simulated learner runs, and saved evidence.
 
 `src/author-skills/` is the source of truth for author-facing skills. Optional agent-specific adapters live under each skill's `agents/` folder.
 

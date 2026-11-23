@@ -1,5 +1,9 @@
 function info = prepareWorkspace(options)
 %PREPAREWORKSPACE Copy a mission runtime bundle into a learner workspace.
+%   ContentRoot selects local mission or marketplace content instead of the
+%   registered catalog. TutorSkillRoot selects an explicit tutor snapshot.
+%   RegisterWorkspace=false skips recent-workspace and discovery registration;
+%   normal workspace-local progress behavior and tutor permissions still apply.
 
     arguments
         options.MissionName (1, 1) string = "root-inports-outports"
@@ -10,6 +14,9 @@ function info = prepareWorkspace(options)
         options.Force (1, 1) logical = false
         options.RequireEmpty (1, 1) logical = false
         options.AgentClient (1, 1) string = "codex"
+        options.ContentRoot (1, 1) string = ""
+        options.TutorSkillRoot (1, 1) string = ""
+        options.RegisterWorkspace (1, 1) logical = true
     end
 
     workspaceRoot = options.WorkspaceRoot;
@@ -26,7 +33,10 @@ function info = prepareWorkspace(options)
     forceRefresh = options.ForceRefresh || options.Force;
     agentClient = normalizeAgentClient(options.AgentClient);
 
-    missions = interactiveMissions.catalog(Audience="all");
+    if strlength(strtrim(options.ContentRoot)) > 0 && ~isfolder(options.ContentRoot)
+        error("InteractiveMissions:InvalidContentRoot", "ContentRoot must name an existing mission content folder.");
+    end
+    missions = interactiveMissions.catalog(ContentRoot=options.ContentRoot, Audience="all");
     missionIndex = find(missions.MissionName == missionName | missions.MissionId == missionName, 1);
     if isempty(missionIndex)
         error("InteractiveMissions:MissionNotFound", "Mission %s is not available.", missionName);
@@ -38,6 +48,12 @@ function info = prepareWorkspace(options)
     end
     runtimeAssetsRoot = fullfile(interactiveMissions.internal.toolboxRoot(), "src");
     skillRoot = fullfile(runtimeAssetsRoot, "skills", "mission-tutoring");
+    if strlength(strtrim(options.TutorSkillRoot)) > 0
+        skillRoot = absolutePath(options.TutorSkillRoot);
+        if ~isfile(fullfile(skillRoot, "SKILL.md"))
+            error("InteractiveMissions:InvalidTutorSkillRoot", "TutorSkillRoot must contain SKILL.md.");
+        end
+    end
 
     ensureSafeWorkspace(workspaceRoot, options.RequireEmpty);
     runtimeRoot = fullfile(workspaceRoot, ".interactive-missions");
@@ -109,13 +125,15 @@ function info = prepareWorkspace(options)
         initializeProgress(progressPath, mission, workspaceRoot);
     end
 
-    settings = struct();
-    settings.LastWorkspace = interactiveMissions.internal.workspaceBaseRoot(workspaceRoot);
-    settings.LastMission = mission.MissionName;
-    settings.ActiveWorkspaces = updateActiveWorkspaces(workspaceRoot);
-    settings.RecentWorkspaces = updateRecentWorkspaces(workspaceRoot);
-    interactiveMissions.preferences("set", Settings=settings);
-    updateActiveWorkspaceIndex(workspaceRoot, manifestPath, progressPath, mission);
+    if options.RegisterWorkspace
+        settings = struct();
+        settings.LastWorkspace = interactiveMissions.internal.workspaceBaseRoot(workspaceRoot);
+        settings.LastMission = mission.MissionName;
+        settings.ActiveWorkspaces = updateActiveWorkspaces(workspaceRoot);
+        settings.RecentWorkspaces = updateRecentWorkspaces(workspaceRoot);
+        interactiveMissions.preferences("set", Settings=settings);
+        updateActiveWorkspaceIndex(workspaceRoot, manifestPath, progressPath, mission);
+    end
 
     info = struct();
     info.WorkspaceRoot = workspaceRoot;
@@ -191,7 +209,7 @@ end
 
 function sourcePath = resolveMissionResource(relativePath, sourceRoot)
     relativePath = string(relativePath);
-    if interactiveMissions.internal.isAbsolutePath(relativePath)
+    if ~isempty(regexp(relativePath, "^[A-Za-z]:[\\/]", "once")) || startsWith(relativePath, filesep)
         sourcePath = relativePath;
     else
         sourcePath = fullfile(sourceRoot, relativePath);
@@ -297,7 +315,7 @@ function ensureSafeWorkspace(workspaceRoot, requireEmpty)
     createFolder(workspaceRoot);
     workspaceRoot = absolutePath(workspaceRoot);
     marketplaceCacheRoot = absolutePath(fullfile(prefdir(), "InteractiveMissions", "marketplaces"));
-    if interactiveMissions.internal.isPathWithin(workspaceRoot, marketplaceCacheRoot)
+    if startsWith(lower(workspaceRoot), lower(marketplaceCacheRoot))
         error("InteractiveMissions:InvalidWorkspace", ...
             "The learner workspace must not be inside the marketplace cache.");
     end
@@ -315,10 +333,11 @@ end
 
 function path = absolutePath(path)
     path = string(path);
-    if ~interactiveMissions.internal.isAbsolutePath(path)
+    if isempty(regexp(path, "^[A-Za-z]:[\\/]", "once")) && ~startsWith(path, filesep)
         path = fullfile(pwd(), path);
     end
     path = replace(path, "/", filesep);
+    path = regexprep(path, "[" + regexptranslate("escape", filesep) + "]+", filesep);
 end
 
 function createFolder(folder)
@@ -463,7 +482,7 @@ end
 
 function validateRelativePath(path)
     path = string(path);
-    if contains(path, "..") || interactiveMissions.internal.isAbsolutePath(path)
+    if contains(path, "..") || startsWith(path, filesep) || ~isempty(regexp(path, "^[A-Za-z]:[\\/]", "once"))
         error("InteractiveMissions:UnsafePath", "Unsafe resource path: %s", path);
     end
 end

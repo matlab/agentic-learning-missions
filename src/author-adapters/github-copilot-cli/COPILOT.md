@@ -2,4 +2,6 @@
 
 This folder is an Interactive Missions marketplace authoring workspace.
 
+Use `evaluate-tutor-skill` or `simulate-mission-learner` for optional evaluation through the Codex evaluation runner. These workflows do not qualify Copilot as an evaluation runtime.
+
 Read `docs/1-index.md` before changing mission content. Start the requested workflow by reading the matching skill under `.interactive-missions/authoring/skills/`. Set the `source_url` TODO in `marketplace/manifest.yaml` before publishing or registering the marketplace.

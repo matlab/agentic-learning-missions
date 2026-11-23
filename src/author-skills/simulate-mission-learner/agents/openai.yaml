@@ -1,0 +1,4 @@
+interface:
+  display_name: "Simulate Mission Learner"
+  short_description: "Evaluate missions with simulated learners"
+  default_prompt: "Use $simulate-mission-learner to evaluate this mission with simulated learners."

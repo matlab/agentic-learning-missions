@@ -38,6 +38,7 @@ Optional fields:
 - `allow_agent_edits`: boolean. Use `true` only for missions that explicitly teach agentic artifact generation or tool-assisted learner artifact editing.
 - `setup`: setup script metadata.
 - `learning_outcomes`: observable capabilities practiced by the mission.
+- `runtime_expectations`: expected state after setup and task resets, checked by `tests/validate_runtime.m`.
 
 ## Tutor Edit Permissions
 
@@ -74,6 +75,10 @@ Setup scripts are optional. If present, `setup.script` must name a file in the m
 Reset scripts for later tasks live under `task_reset_<mission-name>/reset_tNN.m` inside the same mission folder. Setup and reset scripts must not change folders permanently, delete unrelated files, or write learner progress.
 
 `prepareWorkspace` copies `mission.yaml`, the file declared by `setup.script`, an explicitly declared thumbnail, and the complete `task_reset_<mission-name>` directory when present. Omitted or empty thumbnails use the app-rendered generic fallback and do not add a workspace file. It does not copy undeclared helpers or arbitrary mission-folder assets.
+
+`runtime_expectations` is optional. It declares setup and reset assertions for the runtime validator; it does not define learner completion. Use it when setup or reset scripts create task-start state that needs repeatable verification. Assert learner-relevant state such as variables, model structure, parameters, connections, and required figures. Do not assert incidental UI state such as autoscaled Scope axes unless the task explicitly teaches that setting.
+
+For author evaluation, optional `ContentRoot` selects a local mission or marketplace folder instead of the registered catalog, and `TutorSkillRoot` selects an explicit tutor snapshot. `RegisterWorkspace=false` skips recent-workspace and discovery registration. These options do not change tutor edit permissions or the normal workspace-local progress rules; existing defaults remain unchanged.
 
 ## Tasks
 

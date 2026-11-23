@@ -68,10 +68,7 @@ Do not invent MCP tools.
 
 ## Stage 1 - Static Analysis
 
-Read `references/static-analysis.md`, then reason over the YAML text, any
-declared setup script, and reset scripts. Evaluate every task against the full
-static rubric. Also check that `app` metadata accurately describes catalog
-display, visibility, and sorting behavior.
+Read `references/static-analysis.md`, then reason over the YAML text, any declared setup script, reset scripts, and `runtime_expectations`. Evaluate every task against the full static rubric. Also check that `app` metadata accurately describes catalog display, visibility, and sorting behavior.
 
 Before presenting findings, read `references/report-format.md`. Present the
 Stage 1 report as a markdown checklist grouped by priority, assign sequential
@@ -98,6 +95,12 @@ level:
 - `--light`: flag only obvious gaps and skip step-by-step simulation.
 - omitted flag: use Medium rigor.
 - `--heavy`: mentally simulate the mission as a novice learner.
+
+When the development checkout provides `tests/validate_runtime.m` and the mission has setup, reset, or `runtime_expectations` content, run it with explicit mission scope through MATLAB MCP. Treat a mismatch as a High priority finding that cites the task and conflicting artifact.
+
+For every task involving simulation results, figures, Simulation Data Inspector, or direct configuration, add a verification evidence table to the Stage 2 report. Record the learner-facing claim, authoritative source, learner model or artifact binding, freshness check, negative scenario, and unverified fallback. Under `--heavy`, test applicable absent-run, failed-run, wrong-model, stale-conflict, and unavailable-inspection scenarios. Use isolated state where practical and do not modify learner-facing mission content merely to create a QA fixture.
+
+Classify each finding as a mission-contract defect, tutor behavior defect, observer or evaluator defect, or infrastructure interruption. A conflicting or unavailable observer result is `unknown` unless the mission contract itself is contradicted. Do not turn evaluator uncertainty into a mission defect or a learner failure.
 
 Before presenting findings, read `references/report-format.md`. Append Stage 2
 findings to the same report format, continuing the issue ID sequence from
@@ -139,6 +142,9 @@ Run cleanup even if checks fail. Do not leave a half-built model open.
   setup/reset file, or MATLAB/MCP observation.
 - **Protect learner discovery while enabling rescue.** Flag initial instructions that unnecessarily give away the procedure. Do not flag a hint merely because it contains commands, UI paths, exact values, library paths, or wiring steps; validate whether the detail is accurate, useful at that disclosure level, and consistent with the task.
 - **Review from the learner-facing contract.** Flag hidden completion requirements, checks that reject behaviorally equivalent solutions, and checks that can inspect stale or unrelated state. Require fresh inspection before rejection and after a disputed assessment.
+- **Separate wrong from unverified.** Flag a completion check that treats stale or unavailable inspection as proof of an incorrect learner configuration. Require current, model-specific evidence; when it is unavailable, the task remains pending without asking the learner to redo otherwise supported work.
+- **Require evidence ownership.** For simulation, figure, SDI, and configuration tasks, flag a check that relies only on a variable name, active figure, stopped status, or cached observation. Require current evidence that belongs to the learner's model or task-owned artifact.
+- **Review expectation traceability.** When `runtime_expectations` is present, compare each learner-visible name, value, and required behavior with the related instruction, hints, completion check, setup script, and reset script. Do not require incidental display state such as autoscaled axes unless the task teaches it.
 - **Cross-reference everything.** A variable name, block path, or parameter
   that appears anywhere in the mission ecosystem should be verified against its
   source of truth.

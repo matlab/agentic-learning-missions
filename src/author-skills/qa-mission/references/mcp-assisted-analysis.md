@@ -50,11 +50,23 @@ For each outcome-oriented instruction, test at least one reasonable alternative 
 
 Review every rejection path for fresh inspection. Figure checks should inspect all candidate figures instead of relying on `gcf`; simulation checks should tie results and SDI runs to the current model and run; model checks should reacquire current structure after learner changes. Re-run inspection after a simulated learner dispute.
 
+## High-Risk Verification Scenarios
+
+For every task that depends on a simulation result, figure, Simulation Data Inspector signal, or direct model configuration, complete a verification evidence table in the Stage 2 report. Identify the learner-facing claim, authoritative source, model or artifact binding, freshness check, negative scenario, and unverified fallback.
+
+Under Heavy rigor, test each applicable scenario in isolated state: no completed run, failed run, a result from another model, a stale observation that conflicts with a fresh direct read, and unavailable direct inspection. Do not edit learner-facing mission content to create a fixture. A correct current direct read wins over a cached observation. An unavailable or conflicting observer result is unknown unless the mission contract itself is contradicted.
+
 ## Reset Script Chain
 
 If reset scripts exist for this mission, run them in sequence, such as `reset_t02`, `reset_t03`, and onward, to verify they execute without error. Each reset script should produce the state that its task number starts from.
 
 Flag any script that errors. If a reset script hardcodes a model name, note this as a Medium finding because it is fragile if the learner names their model differently.
+
+## Runtime Expectations
+
+When the mission declares `runtime_expectations` and the development checkout provides `tests/validate_runtime.m`, run the validator through MATLAB MCP with explicit mission scope. Report a failed expectation as High priority and cite the task, expectation, and setup or reset artifact that conflicts.
+
+Review expectations as task-start evidence only. Do not require incidental UI state such as an autoscaled Scope range unless the task explicitly teaches that state.
 
 ## Version-Specific Issues
 

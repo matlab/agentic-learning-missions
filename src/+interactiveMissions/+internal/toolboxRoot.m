@@ -1,8 +1,8 @@
 function root = toolboxRoot()
 %TOOLBOXROOT Return the Interactive Missions toolbox root folder.
 
-    appEntryPath = string(which("InteractiveMissions"));
-    if strlength(appEntryPath) == 0
+    openAppPath = string(which("interactiveMissions.openApp"));
+    if strlength(openAppPath) == 0
         candidate = string(pwd());
         while strlength(candidate) > 0
             if isfolder(fullfile(candidate, "marketplace")) && isfolder(fullfile(candidate, "src"))
@@ -19,5 +19,5 @@ function root = toolboxRoot()
             "Cannot locate the Interactive Missions toolbox root on the MATLAB path.");
     end
 
-    root = string(fileparts(fileparts(appEntryPath)));
+    root = string(fileparts(fileparts(fileparts(openAppPath))));
 end

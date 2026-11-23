@@ -1,8 +1,8 @@
 % Ready for Task 06: Inport -> low-pass filter -> Outport.
 run('reset_t05.m');
 
-% First-order low-pass Transfer Fcn with a 0.3-second time constant.
-tau = 0.3;
+% First-order low-pass Transfer Fcn with a 0.15-second time constant.
+tau = 0.15;
 add_block("simulink/Continuous/Transfer Fcn", mdl + "/LowPass");
 set_param(mdl + "/LowPass", "Numerator", "1");
 set_param(mdl + "/LowPass", "Denominator", mat2str([tau 1]));

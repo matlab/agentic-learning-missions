@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "reviewer": "Alisha",
+  "packet_sha256": "bf9d8957c3fb0c6a5852055ece9660df5e1ccc5b2216cd910d3d51c14dda8600",
+  "exported_at": "2026-10-23T18:50:54.237Z",
+  "status": "author_reviewed_pending_validation",
+  "persona_guidance": {
+    "casual": "A casual learner can demonstrate increasing understanding as they proceed through the mission. Do not fail fidelity solely for later competence, increasing independence, or API lookup; check the actual assigned mistakes and behavior.",
+    "naive": "In the reviewed naive example, the clear, fully developed explanation of continuous versus discrete behavior before instruction was too advanced for the persona. Assess early target-topic understanding separately from competence gained during the mission. Do not force incorrect answers or use API lookup alone as evidence of expert topic knowledge."
+  },
+  "recovery_guidance": "If no learner mistake or recovery opportunity occurred, report recovery as unknown/not exercised, not a pass or fail. Tutor recovery from its own inspection error is a separate event.",
+  "verification_guidance": "Assess verification against the learner-facing instruction as directly as available APIs permit. For an SDI display task, inspect the selected SDI signal and its time/data values; workspace output alone does not establish that the correct signal is displayed. Keep observed verification quality separate from an independent observer exception; that exception alone cannot establish false acceptance. A recovered inspection API error is acceptable when successful subsequent checks establish the requested outcome. For the reviewed SDI sequence, the selected signal and matching time/data establish sufficient inspection; the failed visibility API does not prove that the window was closed. Do not require an error-free inspection sequence.",
+  "probe_principles": "Use the same question before and after. Score actual incorrect answers 0, partial answers 1, and answers satisfying the core concepts 2. Missing responses or evidence are unknown, never zero. Accept equivalent wording or implementations. Cite both probes. Do not require improvement from a strong expert baseline. These are synthetic learning proxies, not human learning or causal tutor effects.",
+  "probes": {
+    "root-inports-outports": {
+      "explanation": {
+        "question": "Explain how time-stamped workspace data enters and leaves a Simulink model, and how you would check the sample interval.",
+        "scores": {
+          "2": "Explain routing time-stamped workspace data through model input settings and a root Inport, logging output from a root Outport, and checking adjacent timestamps for sample interval.",
+          "1": "Correct input/output idea but missing the root-port route or interval check.",
+          "0": "Says connecting an arbitrary workspace variable automatically supplies timed input; cannot explain either direction."
+        }
+      },
+      "transfer": {
+        "question": "For a new noisy temperature signal, explain how you would test that a filter preserves a slow trend and attenuates fast noise, and compare the result with the input.",
+        "scores": {
+          "2": "Use a known slow trend plus faster noise, compare input and filtered output on a common time axis, and check trend preservation versus noise attenuation, including lag or distortion.",
+          "1": "Mentions smoothing and an overlay but no independent check of retained trend or attenuation.",
+          "0": "Treats a smoother-looking signal as sufficient proof or claims filtering should remove the slow trend."
+        }
+      }
+    },
+    "continuous-and-discrete-time": {
+      "explanation": {
+        "question": "Explain the difference between a continuous source and a sampled-and-held version of that source.",
+        "scores": {
+          "2": "Distinguish a changing source from values sampled at discrete instants and held until the next sample.",
+          "1": "Knows values update at intervals but omits holding behavior.",
+          "0": "Claims a held output follows the source continuously between samples."
+        }
+      },
+      "transfer": {
+        "question": "A new sensor samples a smoothly changing signal every 0.2 seconds. Predict what its held output looks like between samples and how you would compare it with the original.",
+        "scores": {
+          "2": "Predict flat 0.2-second intervals followed by updates; compare with the original on a common time axis, with agreement at sample instants and possible differences between them.",
+          "1": "Predicts steps but cannot explain when values agree or how to compare.",
+          "0": "Predicts smooth interpolation or updates unrelated to sample instants."
+        }
+      }
+    }
+  },
+  "follow_up": {
+    "packet_sha256": "f7322dd5adcce14e6313ef4985dd3d2fbb6f4ebba1da45cb7ee8a189e86fb84d",
+    "exported_at": "2026-10-24T02:21:34.829Z",
+    "reviewer": ""
+  },
+  "boundary_guidance": "Judge each trace under its contemporaneous mission permissions. If the independent checker also ran simulations between state capture and observation, before/after Scope or SDI differences alone cannot establish which effects the tutor caused. Use unknown when attribution is unresolved; do not turn absent proof into a pass. Separately evidenced direct learner-state edits can still fail. A permitted verification simulation is not retroactively forbidden by a tentative preference for future passive verification.",
+  "future_policy_note": "The user tentatively prefers inspection of state produced by learner actions, with any reference-answer calculation on a separate model. This preference is recorded for future policy/mission design; production tutor and mission rules are unchanged in this feedback incorporation."
+}

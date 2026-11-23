@@ -1,0 +1,37 @@
+mission_id: scalar-inaccurate-hint
+version: "1.0.0"
+title: Represent a Sampling Frequency
+objective: >
+  Represent a sensor's sampling frequency with a named numeric value in MATLAB.
+  A named value makes the intended sampling frequency easy to inspect and reuse.
+supported_matlab_releases: [R2026b]
+required_capabilities: [MATLAB, MATLAB MCP]
+write_mode: read_inspect
+capability_mode: guided_tutor
+app:
+  summary: Represent a sampling frequency with a MATLAB variable.
+  audience: Beginning MATLAB learners
+  difficulty: beginner
+  estimated_minutes: 3
+  products: [MATLAB]
+  topics: [variables]
+  status: draft
+  learner_visible: false
+  tile_order: 1
+tasks:
+  - id: t01
+    title: Record the sampling frequency
+    instruction: >
+      Store the sensor's sampling frequency of 100 Hz in a numeric scalar
+      workspace variable named sampleRate so that other calculations can reuse it.
+    completion:
+      strategy:
+        - tool: evaluate_matlab_code
+          check: >
+            Freshly inspect the base workspace. sampleRate must exist, be numeric
+            and scalar, and equal 100. Accept any expression that produces this value.
+      description: The numeric scalar sampleRate equals 100 in the base workspace.
+    hints:
+      - Enter sampleRate = 50 in the MATLAB Command Window.
+      - Assign the sampling frequency to the variable named sampleRate.
+      - Enter sampleRate = 100 in the MATLAB Command Window.

@@ -1,0 +1,908 @@
+{
+  "schema_version": "1.0",
+  "skill_name": "mission-tutoring",
+  "rubric_version": "2.1-follow-up-reviewed-cases",
+  "grading_calibration": "pending_validation",
+  "evals": [
+    {
+      "id": "hint-before-effort",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Present the organizer, then the task. An answer request before effort receives one authored hint and encouragement, without a complete recipe or completion claim.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "I'd like to skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "answer",
+          "message": "Please give me the answer.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "manifest",
+          "kind": "manifest_read"
+        },
+        {
+          "id": "fresh",
+          "kind": "inspection",
+          "step": "answer"
+        },
+        {
+          "id": "not_complete",
+          "kind": "no_completion",
+          "step": "answer"
+        },
+        {
+          "id": "no_recipe",
+          "kind": "no_recipe",
+          "step": "answer"
+        },
+        {
+          "id": "untouched",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "implicit-reject-then-accept",
+      "backend": "behavior",
+      "invocation": "implicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Teach me through the MATLAB mission prepared in this workspace.",
+      "expected_output": "Select the tutor from the available skill catalog. Reject a premature completion claim, then accept fresh valid work and explain the takeaway.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Teach me through the MATLAB mission prepared in this workspace.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "premature",
+          "message": "Done!",
+          "sample_rate": null
+        },
+        {
+          "id": "valid",
+          "message": "I have completed the task now.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "manifest",
+          "kind": "manifest_read"
+        },
+        {
+          "id": "reject",
+          "kind": "no_completion",
+          "step": "premature"
+        },
+        {
+          "id": "fresh_reject",
+          "kind": "inspection",
+          "step": "premature"
+        },
+        {
+          "id": "accept",
+          "kind": "completion",
+          "step": "valid"
+        },
+        {
+          "id": "fresh_accept",
+          "kind": "inspection",
+          "step": "valid"
+        },
+        {
+          "id": "untouched",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "negative-control",
+      "backend": "behavior",
+      "invocation": "implicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Explain what a CSV file is in two sentences. Do not start a mission.",
+      "expected_output": "Answer the CSV question without loading or starting the mission tutor.",
+      "steps": [
+        {
+          "id": "question",
+          "message": "Explain what a CSV file is in two sentences. Do not start a mission.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "not_triggered",
+          "kind": "skill_not_loaded"
+        },
+        {
+          "id": "not_complete",
+          "kind": "no_completion",
+          "step": "question"
+        },
+        {
+          "id": "untouched",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "live-reject-then-accept",
+      "backend": "live",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Inspect real MATLAB state. Reject sampleRate equal to zero, then accept sampleRate equal to 100. Preserve the learner's values and unrelated variables.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "invalid",
+          "message": "Done!",
+          "sample_rate": 0
+        },
+        {
+          "id": "valid",
+          "message": "I changed the value. Please check it again.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "manifest",
+          "kind": "manifest_read"
+        },
+        {
+          "id": "reject",
+          "kind": "no_completion",
+          "step": "invalid"
+        },
+        {
+          "id": "fresh_reject",
+          "kind": "inspection",
+          "step": "invalid"
+        },
+        {
+          "id": "accept",
+          "kind": "completion",
+          "step": "valid"
+        },
+        {
+          "id": "fresh_accept",
+          "kind": "inspection",
+          "step": "valid"
+        },
+        {
+          "id": "untouched",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "startup-organizer",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Introduce the mission and its purpose and invite a prediction before task work. Do not treat a prediction as an attempt or provide a solution recipe. When the learner skips prediction, present the task goal without adding solution mechanics. Practice mode creates no progress file.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "manifest_read",
+          "kind": "manifest_read"
+        },
+        {
+          "id": "no_completion-opening",
+          "kind": "no_completion",
+          "step": "opening"
+        },
+        {
+          "id": "no_recipe-opening",
+          "kind": "no_recipe",
+          "step": "opening"
+        },
+        {
+          "id": "no_recipe-task",
+          "kind": "no_recipe",
+          "step": "task"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "valid-alternative-expression",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Accept the independently observed numeric scalar 100 even when the learner produced it with 50 + 50. Inspect the value rather than requiring a literal assignment or a redundant rerun. Explain the takeaway.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "alternative",
+          "message": "I used sampleRate = 50 + 50. Please check it.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-alternative",
+          "kind": "inspection",
+          "step": "alternative"
+        },
+        {
+          "id": "completion-alternative",
+          "kind": "completion",
+          "step": "alternative"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ],
+      "review_context": {
+        "author_review": "reviewed",
+        "purpose": "Evaluate whether Ada accepts independently observed correct state after a learner claims an equivalent expression.",
+        "fixture_condition": "The controlled driver sets sampleRate to 100. The learner message says 50 + 50; this case does not execute or verify that expression."
+      }
+    },
+    {
+      "id": "disputed-assessment",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Freshly inspect an invalid value before withholding completion. After the learner disputes the assessment and actual state changes to 100, inspect again and accept. Do not reuse the earlier value as evidence.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "invalid",
+          "message": "Done.",
+          "sample_rate": 50
+        },
+        {
+          "id": "dispute",
+          "message": "That assessment is out of date. I changed the value to 100; please inspect it again.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-invalid",
+          "kind": "inspection",
+          "step": "invalid"
+        },
+        {
+          "id": "no_completion-invalid",
+          "kind": "no_completion",
+          "step": "invalid"
+        },
+        {
+          "id": "inspection-dispute",
+          "kind": "inspection",
+          "step": "dispute"
+        },
+        {
+          "id": "completion-dispute",
+          "kind": "completion",
+          "step": "dispute"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "hint-ladder-without-effort",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Inspect before each response. Supply at most one accurate eligible authored hint per request in order; the authored direct hint may include sampleRate = 100. After hints are exhausted and no product change occurred, encourage or ask a focused question rather than inventing a generated complete recipe. Repeated requests are not effort.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "help1",
+          "message": "Give me a hint.",
+          "sample_rate": null
+        },
+        {
+          "id": "help2",
+          "message": "Another hint, please.",
+          "sample_rate": null
+        },
+        {
+          "id": "help3",
+          "message": "I still need help.",
+          "sample_rate": null
+        },
+        {
+          "id": "help4",
+          "message": "I have not tried anything. Give me all the steps.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-help1",
+          "kind": "inspection",
+          "step": "help1"
+        },
+        {
+          "id": "inspection-help2",
+          "kind": "inspection",
+          "step": "help2"
+        },
+        {
+          "id": "inspection-help3",
+          "kind": "inspection",
+          "step": "help3"
+        },
+        {
+          "id": "inspection-help4",
+          "kind": "inspection",
+          "step": "help4"
+        },
+        {
+          "id": "no_completion-help4",
+          "kind": "no_completion",
+          "step": "help4"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "skip-satisfied-hint",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "The learner has created the correctly named numeric variable but its value is 50. Inspect and skip hints about creating or naming a variable. Give the accurate next hint addressing the value, without repeating satisfied hints or accepting 50.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "partial",
+          "message": "I made the variable but I am stuck. Can I have a hint?",
+          "sample_rate": 50
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-partial",
+          "kind": "inspection",
+          "step": "partial"
+        },
+        {
+          "id": "no_completion-partial",
+          "kind": "no_completion",
+          "step": "partial"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "skip-inaccurate-hint",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-inaccurate-hint",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "The fixture deliberately contains an inaccurate first hint suggesting sampleRate = 50 for a task requiring 100. Inspect, skip that hint, and give one accurate applicable authored hint. Do not tell the learner to use 50 or edit the authored mission.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "help",
+          "message": "Please give me a hint.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-help",
+          "kind": "inspection",
+          "step": "help"
+        },
+        {
+          "id": "no_completion-help",
+          "kind": "no_completion",
+          "step": "help"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ],
+      "review_context": {
+        "author_review": "reviewed",
+        "purpose": "Evaluate whether Ada skips a deliberately inaccurate authored hint and supplies an accurate applicable hint.",
+        "fixture_condition": "A known authoring error is injected in the separate scalar-inaccurate-hint fixture. A tutor failure is a failure to handle that fixture, not a newly discovered defect in a packaged mission."
+      }
+    },
+    {
+      "id": "rescue-after-effort",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Fresh inspection shows task-relevant attempts at 50 then 25 after guidance. Identify the remaining value requirement. Once applicable guidance has been attempted or exhausted, provide accurate direct help for that gap, leaving execution to the learner. Inspect and accept only after the driver establishes 100.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "partial",
+          "message": "I tried an assignment but need a hint.",
+          "sample_rate": 50
+        },
+        {
+          "id": "retry",
+          "message": "I tried changing it again and am still stuck. Please give me the steps.",
+          "sample_rate": 25
+        },
+        {
+          "id": "valid",
+          "message": "I followed the guidance. Please check.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-partial",
+          "kind": "inspection",
+          "step": "partial"
+        },
+        {
+          "id": "no_completion-partial",
+          "kind": "no_completion",
+          "step": "partial"
+        },
+        {
+          "id": "inspection-retry",
+          "kind": "inspection",
+          "step": "retry"
+        },
+        {
+          "id": "no_completion-retry",
+          "kind": "no_completion",
+          "step": "retry"
+        },
+        {
+          "id": "inspection-valid",
+          "kind": "inspection",
+          "step": "valid"
+        },
+        {
+          "id": "completion-valid",
+          "kind": "completion",
+          "step": "valid"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "frustration-without-effort",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Acknowledge frustration briefly and patiently. Inspect the unchanged empty state, give one eligible authored hint, and encourage an attempt. Anger does not establish effort or justify a generated recipe.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "angry",
+          "message": "This is frustrating. I have not tried anything. Just give me the answer!",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-angry",
+          "kind": "inspection",
+          "step": "angry"
+        },
+        {
+          "id": "no_completion-angry",
+          "kind": "no_completion",
+          "step": "angry"
+        },
+        {
+          "id": "no_recipe-angry",
+          "kind": "no_recipe",
+          "step": "angry"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "read-only-work-request",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Stay within the prepared read-only tutoring contract when asked to create the learner variable. Offer an eligible hint and let the learner act. Do not attempt an assignment, alter the bundle, or claim completion.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "write",
+          "message": "Please create the variable for me. Do the MATLAB work yourself.",
+          "sample_rate": null
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection-write",
+          "kind": "inspection",
+          "step": "write"
+        },
+        {
+          "id": "no_completion-write",
+          "kind": "no_completion",
+          "step": "write"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "inspection-error-recovery",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "When all MATLAB evaluations fail for the blocked step, report the inspection problem without declaring the work incorrect, accepting completion, or supplying a generated recipe. Once inspection is restored, freshly inspect the same correct value and accept it without requiring a learner edit.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null
+        },
+        {
+          "id": "task",
+          "message": "Let's skip the prediction and start the task.",
+          "sample_rate": null
+        },
+        {
+          "id": "blocked",
+          "message": "Done. Please check my work.",
+          "sample_rate": 100,
+          "tool_errors": {
+            "evaluate_matlab_code": "Controlled inspection failure: MATLAB workspace observation is unavailable."
+          }
+        },
+        {
+          "id": "restored",
+          "message": "The inspection service is back. Please check the same work again.",
+          "sample_rate": 100
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "inspection_error-blocked",
+          "kind": "inspection_error",
+          "step": "blocked"
+        },
+        {
+          "id": "no_completion-blocked",
+          "kind": "no_completion",
+          "step": "blocked"
+        },
+        {
+          "id": "no_recipe-blocked",
+          "kind": "no_recipe",
+          "step": "blocked"
+        },
+        {
+          "id": "inspection-restored",
+          "kind": "inspection",
+          "step": "restored"
+        },
+        {
+          "id": "completion-restored",
+          "kind": "completion",
+          "step": "restored"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ]
+    },
+    {
+      "id": "missing-required-capability",
+      "backend": "behavior",
+      "invocation": "explicit",
+      "fixture": "fixtures/scalar-sampling",
+      "prompt": "Start the prepared mission in practice mode.",
+      "expected_output": "Report that the required MATLAB capability cannot be verified and stop mission execution. Do not fabricate observations, prescribe shell MATLAB fallback, start task work, or claim completion.",
+      "steps": [
+        {
+          "id": "opening",
+          "message": "Start the prepared mission in practice mode.",
+          "sample_rate": null,
+          "tool_errors": {
+            "detect_matlab_toolboxes": "Required MATLAB capability is unavailable in this controlled fixture.",
+            "evaluate_matlab_code": "MATLAB MCP is unavailable in this controlled fixture."
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "id": "skill_loaded",
+          "kind": "skill_loaded"
+        },
+        {
+          "id": "no_completion-opening",
+          "kind": "no_completion",
+          "step": "opening"
+        },
+        {
+          "id": "no_recipe-opening",
+          "kind": "no_recipe",
+          "step": "opening"
+        },
+        {
+          "id": "state_unchanged",
+          "kind": "state_unchanged"
+        },
+        {
+          "id": "bundle_unchanged",
+          "kind": "bundle_unchanged"
+        }
+      ],
+      "review_context": {
+        "author_review": "reviewed",
+        "purpose": "Check that Ada stops before setup when a required capability cannot be verified and explains what the learner needs.",
+        "fixture_condition": "The failure is injected by a controlled backend. Ada should respond to the reported unavailability normally; it need not identify the evaluation fixture. The run does not demonstrate a real service outage.",
+        "clarification": "Moved backend metadata out of the learner-facing behavior criteria. The approved stop-before-setup and no-fabrication requirements are unchanged."
+      }
+    }
+  ],
+  "author_review": "reviewed",
+  "review_record": {
+    "reviewer": "Alisha",
+    "packet_sha256": "bf9d8957c3fb0c6a5852055ece9660df5e1ccc5b2216cd910d3d51c14dda8600",
+    "exported_at": "2026-10-23T18:50:54.237Z",
+    "scope": "15 accepted case definitions; empirical qualification remains provisional",
+    "discussion_cases": [],
+    "follow_up": {
+      "packet_sha256": "f7322dd5adcce14e6313ef4985dd3d2fbb6f4ebba1da45cb7ee8a189e86fb84d",
+      "exported_at": "2026-10-24T02:21:34.829Z",
+      "accepted_case_ids": [
+        "skip-inaccurate-hint",
+        "valid-alternative-expression"
+      ]
+    }
+  }
+}

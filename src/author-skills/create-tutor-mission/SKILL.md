@@ -159,6 +159,14 @@ Do not invent MCP tools. Choose completion strategies from the allowed list and
 write semantic checks that the tutor can interpret instead of brittle string
 matches.
 
+For every task, trace the learner-facing instruction and hints to semantic completion evidence and, when a setup or reset script establishes its starting state, to `runtime_expectations`. Learner-visible names, exact values, and required behavior must agree across those artifacts. Completion checks must inspect current, task-relevant state. If inspection is stale or unavailable, treat the task as unverified and pending; do not describe correct work as incorrect or tell the learner to repeat it solely because verification failed.
+
+Use `runtime_expectations` only for repeatable setup or reset state. Assert variables, model structure, parameters, connections, result objects, or required figures. Do not assert incidental presentation state such as autoscaled Scope limits unless the task explicitly teaches that setting.
+
+For every task that depends on a simulation result, figure, Simulation Data Inspector signal, or direct model configuration, write a verification design before drafting its completion strategy. Identify the learner-facing claim, authoritative current state, learner model or artifact binding, freshness evidence, success evidence, genuine failure evidence, and unverified fallback. A variable name, active figure, stopped model, or cached result alone is not sufficient evidence. Tie a result to the learner's current model and task. When a direct current read conflicts with a cached observation, use the direct read. When no current read is available, leave the task pending and explain the verification limit.
+
+Before publishing a mission with a high-risk task, use `simulate-mission-learner` to prepare an evaluation specification and review its outcomes, mistake schedules, and observer limits. Run learner simulation only when a suitable observer exists. If no observer can independently evaluate the task, record it as unqualified rather than inventing simulation evidence.
+
 ## Step 5 - Write The Mission YAML
 
 Use `references/mission-yaml.md` for the mission template, learning outcome
@@ -174,6 +182,8 @@ allowed MCP tools. If hints were omitted, generate them before writing the YAML.
 Include the `setup` block only when the mission uses a setup script. If no setup
 script is needed, omit `setup` and make task 1 explicit about the learner's
 manual starting condition.
+
+When the mission uses setup or reset scripts, add `runtime_expectations` that describe the learner-relevant state each script establishes. `runtime_expectations` supports runtime testing; it does not replace task completion strategies.
 
 Include the required `app` block. For normal learner
 missions use `status: published` and `learner_visible: true`. For UI validation
@@ -203,10 +213,9 @@ root.
 
 The setup process must:
 
-1. Load the `matlab-script-writing` skill for MATLAB coding conventions.
-2. Draft and run the code via `evaluate_matlab_code` or `run_matlab_file` to
+1. Draft and run the code via `evaluate_matlab_code` or `run_matlab_file` to
    validate it.
-3. Write the setup script only after successful execution.
+2. Write the setup script only after successful execution.
 
 Do not skip MCP validation for setup scripts.
 
@@ -235,4 +244,5 @@ After creating the mission files:
 4. Confirm user-supplied procedural text was kept out of the initial instruction when it would give away the method, and was preserved or adapted into an appropriate later hint when useful.
 5. Confirm required `app` metadata is present and internally consistent.
 6. Confirm the objective and Task 1 instruction can support the opening organizer without consulting hints or completion criteria, and that any explicit prerequisite or assumed-prior-knowledge statement in the objective is clear enough for Ada to repeat.
-7. Use the `qa-mission` skill for a full QA pass on the new mission.
+7. When the development checkout provides `tests/validate_runtime.m`, run it through MATLAB MCP with explicit mission scope for any mission that has setup, reset, or `runtime_expectations` content.
+8. Use the `qa-mission` skill for a full QA pass on the new mission. For every high-risk task, review the verification design with QA and prepare an evaluation specification before publishing.

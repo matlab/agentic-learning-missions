@@ -43,6 +43,18 @@ sequence:
       *Fix available*
 ```
 
+For every task that uses simulation results, figures, Simulation Data Inspector, or direct configuration, append this evidence table before the Stage 2 findings:
+
+```markdown
+#### Verification evidence
+
+| Task | Learner-facing claim | Authoritative source | Binding and freshness | Negative scenario | Unverified fallback |
+| --- | --- | --- | --- | --- | --- |
+| tNN | <claim> | <current state> | <learner model or task artifact> | <applicable case> | <unverified pending wording> |
+```
+
+Classify each finding as `mission_contract`, `tutor_behavior`, `observer_evaluator`, or `infrastructure`. An unresolved observer conflict remains `unknown`; do not label it as a learner or mission failure without contrary mission evidence.
+
 ## Priority Assignment
 
 - **High** - Learner will get stuck or fail, including missing prerequisites,

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Human feedback · Interactive Missions</title>
+<style>
+:root { color-scheme: light; --blue: #0076a8; --deep: #004b87; --ink: #172f40; --muted: #526574; --border: #d7e0e6; --orange: #d78825; }
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.55 "Segoe UI", system-ui, sans-serif; color: var(--ink); background: #f2f5f8; }
+header { padding: 28px max(24px, calc((100vw - 1120px)/2)); color: white; background: linear-gradient(110deg, #073956, var(--deep)); }
+header p { color: #d7e7f2; } h1 { font-size: 32px; line-height: 1.2; } h2 { font-size: 20px; } h1, h2, p { margin: 0 0 12px; }
+main { max-width: 1168px; margin: auto; padding: 24px; } section, article { padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: white; margin-bottom: 20px; }
+.intro { border-left: 4px solid var(--orange); } .brand { font-size: 12px; letter-spacing: 1.4px; } .flow { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 16px 0; }
+.flow span { padding: 8px 12px; background: #eaf4f8; border: 1px solid var(--border); border-radius: 6px; } .flow b { color: var(--blue); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; } button, input, textarea { font: inherit; } button { padding: 8px 12px; color: var(--deep); background: white; border: 1px solid #aabcc8; border-radius: 6px; cursor: pointer; }
+button:hover { background: #eaf4f8; } .primary { background: var(--blue); color: white; } .primary:hover { background: var(--deep); } :focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+input:not([type=radio]), textarea { padding: 8px; border: 1px solid #aabcc8; border-radius: 5px; max-width: 100%; } textarea { width: 100%; resize: vertical; }
+.layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 24px; } nav { display: grid; align-content: start; gap: 8px; } nav button { text-align: left; overflow-wrap: anywhere; } nav button[aria-current=true] { background: #dfedf4; border-left: 4px solid var(--blue); }
+fieldset { border: 0; padding: 0; margin: 18px 0; } fieldset label { display: inline-flex; align-items: center; gap: 6px; margin: 6px 18px 6px 0; } input[type=radio] { accent-color: var(--blue); }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: #f4f7f9; border: 1px solid var(--border); border-radius: 5px; font: 13px/1.6 Consolas, monospace; }
+small, .muted { color: var(--muted); } #status { display: block; margin: 12px 0; } progress { width: 100%; accent-color: var(--blue); } .skip { position: absolute; top: -60px; background: white; padding: 10px; } .skip:focus { top: 0; }
+@media (max-width: 700px) { .layout { grid-template-columns: 1fr; } main { padding: 14px; } header { padding: 24px 14px; } h1 { font-size: 26px; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#review">Skip to review</a>
+<header><p class="brand">INTERACTIVE MISSIONS / AUTHOR REVIEW</p><h1 id="title">Human feedback</h1><p id="instructions"></p></header>
+<main id="review">
+<section class="intro"><h2>How to give feedback</h2><p>Read the evidence, record your judgment, and export JSON. Partial reviews are welcome. No decision is selected for you.</p>
+<div class="flow" role="img" aria-label="Review asset, then make a judgment, then export JSON, then return to the agent and prompt it to ingest the JSON"><span>Review asset</span><b aria-hidden="true">→</b><span>Make a judgment</span><b aria-hidden="true">→</b><span>Export JSON</span><b aria-hidden="true">→</b><span>Return to the agent<br>Prompt it to ingest the JSON</span></div>
+<div class="toolbar"><button class="primary" id="export">Export feedback JSON</button><button id="import">Import feedback JSON</button><input id="file" type="file" accept=".json,application/json" hidden><label>Your name (optional) <input id="reviewer" maxlength="200"></label></div>
+<span id="status" role="status" aria-live="polite"></span><label for="progress" id="progress-label"></label><progress id="progress" value="0"></progress>
+</section>
+<div class="layout"><nav id="queue" aria-label="Review items"></nav><article><p class="muted" id="group"></p><h2 id="item-title"></h2><p id="question"></p><details open><summary>Evidence to review</summary><pre id="evidence"></pre></details><fieldset id="choices"><legend>Your judgment</legend></fieldset><label for="notes">Reason or question (required except for accept)</label><textarea id="notes" rows="4" maxlength="20000"></textarea></article></div>
+<section><h2>Overall feedback</h2><label for="overall">Notes that apply to the review as a whole</label><textarea id="overall" rows="3" maxlength="20000"></textarea></section>
+<section><h2>Return feedback to the agent</h2><p>Save the exported JSON alongside the original review packet. Replace the paths in this prompt and send it to your agent. Exporting does not send or apply feedback.</p><pre id="prompt">Read the review packet at &lt;packet-path&gt; and feedback at &lt;feedback-path&gt;. Validate the packet fingerprint and item IDs. Summarize recorded decisions and unresolved items. Write a review record explaining how each feedback item was handled, with reasons and evidence references. Propose follow-up edits for review. Preserve historical machine results and distinguish tentative suggestions from firm judgments.</pre><details><summary>Sources and packet identity</summary><pre id="sources"></pre><p id="identity"></p></details></section>
+</main>
+<script id="packet-fingerprint" type="application/json">"example-only"</script>
+<script id="review-data" type="application/json">{"schema_version":"1.0","title":"Example review — dummy feedback only","instructions":"These synthetic examples demonstrate the process. They are not evidence about a real mission.","sources":["Synthetic examples bundled with the skill"],"items":[{"id":"example/evidence","group":"Evidence judgments","title":"Is the outcome supported?","question":"Does this excerpt establish task completion?","evidence":"Dummy excerpt: The learner says ‘Done’, but no independent check was recorded. Look for evidence of the requested outcome, not just the completion claim.","choices":["pass","fail","unknown","discuss"]},{"id":"example/proposal","group":"Review proposals","title":"Review a recovery scenario","question":"Should this proposed case be included?","evidence":"Dummy proposal: A learner enters the wrong sample interval, inspects adjacent timestamps, then corrects it. Check whether the case observes recovery rather than merely assuming it.","choices":["accept","revise","exclude","discuss"]}]}</script>
+<script>
+(() => {
+  "use strict";
+  const byId = id => document.getElementById(id);
+  const packet = JSON.parse(byId("review-data").textContent);
+  const fingerprint = JSON.parse(byId("packet-fingerprint").textContent);
+  const storageKey = "mission-learner-review:" + fingerprint;
+  const blankRows = () => packet.items.map(item => ({id: item.id, decision: "pending", notes: ""}));
+  let feedback = {schema_version: "1.0", kind: "mission-learner-review-feedback", packet_sha256: fingerprint, reviewer: "", overall_notes: "", reviews: blankRows()};
+  let selected = 0;
+  let storageAvailable = true;
+  const recorded = row => row.decision !== "pending" && (row.decision === "accept" || row.notes.trim().length > 0);
+
+  function validateFeedback(value) {
+    if (!value || value.schema_version !== "1.0" || value.kind !== feedback.kind || value.packet_sha256 !== fingerprint) throw Error("Feedback does not match this packet and format.");
+    if (typeof value.reviewer !== "string" || value.reviewer.length > 200 || typeof value.overall_notes !== "string" || value.overall_notes.length > 20000 || !Array.isArray(value.reviews)) throw Error("Invalid feedback fields.");
+    const rows = blankRows();
+    const seen = new Set();
+    for (const row of value.reviews) {
+      const index = packet.items.findIndex(item => item.id === row.id);
+      if (index < 0 || seen.has(row.id)) throw Error("Unknown or duplicate review item.");
+      if (!["pending", ...packet.items[index].choices].includes(row.decision) || typeof row.notes !== "string" || row.notes.length > 20000) throw Error("Invalid decision or notes.");
+      rows[index] = {id: row.id, decision: row.decision, notes: row.notes};
+      seen.add(row.id);
+    }
+    return {...feedback, reviewer: value.reviewer, overall_notes: value.overall_notes, reviews: rows};
+  }
+
+  function status(message) { byId("status").textContent = message; }
+  function save() {
+    try { localStorage.setItem(storageKey, JSON.stringify(feedback)); }
+    catch { storageAvailable = false; }
+    status(storageAvailable ? "Draft saved in this browser. Export JSON for a durable copy." : "Browser draft storage is unavailable. Export JSON before closing this page.");
+    updateQueue();
+  }
+  function updateQueue() {
+    byId("queue").replaceChildren();
+    packet.items.forEach((item, index) => {
+      const button = document.createElement("button");
+      button.textContent = (recorded(feedback.reviews[index]) ? "Recorded: " : "Pending: ") + item.title;
+      button.setAttribute("aria-current", String(index === selected));
+      button.onclick = () => { selected = index; renderItem(); updateQueue(); };
+      byId("queue").append(button);
+    });
+    const count = feedback.reviews.filter(recorded).length;
+    byId("progress").max = packet.items.length;
+    byId("progress").value = count;
+    byId("progress-label").textContent = `${count} of ${packet.items.length} judgments recorded`;
+  }
+  function renderItem() {
+    const item = packet.items[selected], row = feedback.reviews[selected];
+    for (const [id, text] of Object.entries({group: item.group, "item-title": item.title, question: item.question, evidence: item.evidence})) byId(id).textContent = text;
+    const choices = byId("choices");
+    choices.replaceChildren();
+    const legend = document.createElement("legend"); legend.textContent = "Your judgment"; choices.append(legend);
+    for (const decision of ["pending", ...item.choices]) {
+      const label = document.createElement("label"), input = document.createElement("input");
+      input.type = "radio"; input.name = "decision"; input.value = decision; input.checked = row.decision === decision;
+      input.onchange = () => { row.decision = decision; save(); };
+      label.append(input, document.createTextNode(decision === "pending" ? "Not reviewed" : decision)); choices.append(label);
+    }
+    byId("notes").value = row.notes;
+  }
+  try {
+    const draft = localStorage.getItem(storageKey);
+    if (draft) feedback = validateFeedback(JSON.parse(draft));
+  } catch { storageAvailable = false; }
+  byId("title").textContent = packet.title;
+  byId("instructions").textContent = packet.instructions;
+  byId("sources").textContent = packet.sources.join("\n");
+  byId("identity").textContent = "Packet SHA-256: " + fingerprint;
+  byId("reviewer").value = feedback.reviewer;
+  byId("overall").value = feedback.overall_notes;
+  byId("notes").oninput = event => { feedback.reviews[selected].notes = event.target.value; save(); };
+  byId("reviewer").oninput = event => { feedback.reviewer = event.target.value; save(); };
+  byId("overall").oninput = event => { feedback.overall_notes = event.target.value; save(); };
+  byId("export").onclick = () => {
+    const blob = new Blob([JSON.stringify(feedback, null, 2) + "\n"], {type: "application/json"});
+    const url = URL.createObjectURL(blob), link = document.createElement("a");
+    link.href = url; link.download = "feedback.json"; document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    status("JSON exported. Save it, then return its path and the original packet path to the agent.");
+  };
+  byId("import").onclick = () => byId("file").click();
+  byId("file").onchange = async event => {
+    try {
+      const file = event.target.files[0]; if (!file) return;
+      if (file.size > 2000000) throw Error("Feedback file is too large.");
+      feedback = validateFeedback(JSON.parse(await file.text()));
+      byId("reviewer").value = feedback.reviewer; byId("overall").value = feedback.overall_notes;
+      renderItem(); save();
+    } catch (error) { status("Import failed: " + error.message); }
+    finally { event.target.value = ""; }
+  };
+  renderItem(); save();
+})();
+</script>
+</body>
+</html>

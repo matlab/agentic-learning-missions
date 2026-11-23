@@ -10,3 +10,7 @@ files:
     target: ".claude/commands/qa-mission.md"
   - source: "maintain-missions.md"
     target: ".claude/commands/maintain-missions.md"
+  - source: "evaluate-tutor-skill.md"
+    target: ".claude/commands/evaluate-tutor-skill.md"
+  - source: "simulate-mission-learner.md"
+    target: ".claude/commands/simulate-mission-learner.md"

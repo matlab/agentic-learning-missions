@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evaluate Tutor Skill"
+  short_description: "Evaluate tutor behavior and teaching quality"
+  default_prompt: "Use $evaluate-tutor-skill to evaluate the selected tutor version."

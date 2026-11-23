@@ -36,16 +36,18 @@ The validator checks:
   are skipped explicitly.
 - Runtime scripts must not change the current folder, permanently alter the
   MATLAB path, or create repository progress files.
-- Optional `runtime_validation` metadata supplies mission-owned behavioral
+- Optional `runtime_expectations` metadata supplies mission-owned behavioral
   assertions for setup and reset states.
 
 The mission content checks are skipped when Simulink&reg; is unavailable.
 Infrastructure checks still run because they use temporary JSON fixtures outside
 the repository.
 
-## Runtime Validation Metadata
+`runtime_expectations` validates repeatable task-start state. It does not define learner completion or replace fresh task verification. Completion checks for simulation, figures, Simulation Data Inspector, and configuration must inspect current learner-owned state and keep unavailable or conflicting inspection results unverified.
 
-Mission YAML can include a top-level `runtime_validation` block. Supported
+## Runtime Expectations Metadata
+
+Mission YAML can include a top-level `runtime_expectations` block. It declares the expected state after setup and each reset; `validate_runtime.m` executes those assertions. Supported
 assertion types are:
 
 - `workspace_var`: base workspace variable exists; optional `class`.
@@ -84,3 +86,9 @@ Handwritten reset scripts remain the supported production strategy. Generated
 reset states need a separate feasibility prototype that can prove the generated
 state is equivalent to the handwritten task start state before any replacement
 is considered.
+
+## Tutor-Skill Evaluation
+
+The [standalone tutor-skill harness](../src/author-skills/references/evaluation/README.md) executes the unchanged learner tutor against controlled conversations and live MATLAB state. It adds agent-behavior evidence beyond the framework and infrastructure validators. It runs independently of the learner simulator and supports frozen baseline/candidate comparisons, per-trial JSONL traces, deterministic assertions, and separate qualitative grading.
+
+The initial cases use a small MATLAB scalar-variable fixture. Qualitative grading remains provisional until author calibration. These synthetic author evaluations do not enable production learner-session logging or change the supported-client matrix.

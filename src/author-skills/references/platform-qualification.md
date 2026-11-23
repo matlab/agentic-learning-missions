@@ -17,7 +17,7 @@ Each adapter must prepare the learner workspace, identify the copied
 `mission-tutoring` skill, preserve the workspace-local progress contract, and
 fail clearly when required MATLAB&reg; MCP capabilities are unavailable.
 
-`startMissionAuthoring()` uses the same supported client IDs to copy the matching authoring adapter. The selected adapter points the client to the portable `create-tutor-mission`, `qa-mission`, and `maintain-missions` skills in the new workspace.
+`startMissionAuthoring()` uses the same supported client IDs to copy the matching authoring adapter. The selected adapter points the client to the portable `create-tutor-mission`, `qa-mission`, `maintain-missions`, `evaluate-tutor-skill`, and `simulate-mission-learner` skills in the new workspace. Evaluation skills invoke the pinned Codex SDK runner; client adapter support does not qualify other evaluator runtimes. See [evaluation setup and limits](evaluation/README.md).
 
 ## Feedback And Logging
 

@@ -86,6 +86,31 @@ Suggested fix:
 tool: model_read
 ```
 
+## Conflicting Runtime Expectation
+
+Problem:
+
+```yaml
+instruction: "Set the filter time constant to 0.15 seconds."
+hints:
+  - "Use a denominator of [0.3 1]."
+runtime_expectations:
+  resets:
+    - task: t06
+      assertions:
+        - type: block_param
+          path: mission01/LowPass
+          parameter: Denominator
+          equals: "[0.15 1]"
+```
+
+Expected finding:
+
+```markdown
+- [ ] **QA-root-inports-outports-004** (t05/t06, runtime_expectations) The task requires a 0.15-second time constant, but its direct hint specifies `[0.3 1]`. The reset expectation uses `[0.15 1]`, so a learner following the hint cannot reach the expected task state. Evidence: task t05 hint 3 and runtime_expectations reset t06.
+      *Fix available*
+```
+
 ## Unobservable Articulation Outcome
 
 Problem:
@@ -112,7 +137,7 @@ tasks:
 Expected finding:
 
 ```markdown
-- [ ] **QA-root-inports-outports-004** (t01, learning_outcomes) `lo01` says the learner can
+- [ ] **QA-root-inports-outports-005** (t01, learning_outcomes) `lo01` says the learner can
       articulate a conceptual difference, but the task only asks them to build
       model structure and does not ask for an explanation. Evidence:
       `<mission-name>.yaml`, task t01.

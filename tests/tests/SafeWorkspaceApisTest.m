@@ -6,6 +6,51 @@ classdef SafeWorkspaceApisTest < matlab.unittest.TestCase
     end
 
     methods (Test)
+        function preparesExplicitSnapshotsWithoutRegistration(testCase, Root)
+            root = string(Root);
+            addSourceFolder(testCase, root);
+            workspaceRoot = string(tempname);
+            testCase.addTeardown(@removeFolder, workspaceRoot);
+            snapshotRoot = string(tempname);
+            copyfile(fullfile(root, "src", "skills", "mission-tutoring"), snapshotRoot);
+            testCase.addTeardown(@removeFolder, snapshotRoot);
+            snapshotText = string(fileread(fullfile(snapshotRoot, "SKILL.md"))) + newline + "<!-- Snapshot fixture -->";
+            writeText(fullfile(snapshotRoot, "SKILL.md"), char(snapshotText));
+            settingsBefore = interactiveMissions.preferences("get");
+            indexPath = fullfile(prefdir(), "InteractiveMissions", "app", "active_workspaces.json");
+            indexBefore = readOptionalFile(indexPath);
+
+            info = interactiveMissions.prepareWorkspace( ...
+                WorkspaceRoot=workspaceRoot, MissionName="continuous-and-discrete-time", ...
+                ContentRoot=fullfile(root, "marketplace", "missions", "continuous-and-discrete-time"), ...
+                TutorSkillRoot=snapshotRoot, ...
+                RegisterWorkspace=false, Mode="practice", RequireEmpty=true);
+
+            testCase.verifyEqual(fileread(fullfile(info.ContentRoot, "mission.yaml")), ...
+                fileread(fullfile(root, "marketplace", "missions", "continuous-and-discrete-time", "mission.yaml")));
+            testCase.verifyEqual(fileread(fullfile(info.SkillRoot, "SKILL.md")), ...
+                char(snapshotText));
+            testCase.verifyEqual(interactiveMissions.preferences("get"), settingsBefore);
+            testCase.verifyEqual(readOptionalFile(indexPath), indexBefore);
+            testCase.verifyFalse(isfile(fullfile(info.RuntimeRoot, "progress.json")));
+        end
+
+        function rejectsInvalidSnapshotRoots(testCase, Root)
+            root = string(Root);
+            addSourceFolder(testCase, root);
+            workspaceRoot = string(tempname);
+            testCase.addTeardown(@removeFolder, workspaceRoot);
+            testCase.verifyError(@() interactiveMissions.prepareWorkspace( ...
+                WorkspaceRoot=workspaceRoot, ContentRoot=fullfile(workspaceRoot, "missing"), ...
+                RegisterWorkspace=false), "InteractiveMissions:InvalidContentRoot");
+            testCase.verifyError(@() interactiveMissions.prepareWorkspace( ...
+                WorkspaceRoot=workspaceRoot, MissionName="continuous-and-discrete-time", ...
+                ContentRoot=fullfile(root, "marketplace", "missions", "continuous-and-discrete-time"), ...
+                TutorSkillRoot=fullfile(workspaceRoot, "missing"), RegisterWorkspace=false), ...
+                "InteractiveMissions:InvalidTutorSkillRoot");
+            testCase.verifyFalse(isfolder(workspaceRoot));
+        end
+
         function validatesCatalog(testCase, Root)
             root = string(Root);
             addSourceFolder(testCase, root);
@@ -363,6 +408,13 @@ end
 function deleteFile(path)
     if isfile(path)
         delete(path);
+    end
+end
+
+function text = readOptionalFile(path)
+    text = "";
+    if isfile(path)
+        text = string(fileread(path));
     end
 end
 

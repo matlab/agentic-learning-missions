@@ -25,7 +25,15 @@ classdef AuthoringWorkspaceTest < matlab.unittest.TestCase
             testCase.verifyFalse(isfile(fullfile(info.DocumentationRoot, "mission-contract.md")));
             testCase.verifyTrue(isfile(fullfile(info.SkillRoot, "references", "mission-contract.md")));
             testCase.verifyTrue(isfile(fullfile(info.SkillRoot, "create-tutor-mission", "SKILL.md")));
+            testCase.verifyTrue(all(isfile(fullfile(info.SkillRoot, ...
+                ["evaluate-tutor-skill", "simulate-mission-learner"], "SKILL.md"))));
+            evaluationFiles = ["scripts/evaluate.py", "scripts/mission_evals/combined.py", ...
+                "requirements-win-py313.txt", "evals/evals.json", "scripts/observe_mission.m"];
+            testCase.verifyTrue(all(isfile(fullfile(info.SkillRoot, "references", "evaluation", evaluationFiles))));
             verifyAdapterFiles(testCase, workspaceRoot, AgentClient);
+            testCase.verifyEmpty(dir(fullfile(info.SkillRoot, "**", "*.pyc")));
+            testCase.verifyEmpty(dir(fullfile(info.SkillRoot, "**", "*.pyo")));
+            testCase.verifyEmpty(dir(fullfile(info.SkillRoot, "**", "__pycache__")));
             testCase.verifyTrue(contains(manifestText, "source_url: ''"));
             testCase.verifyTrue(contains(manifestText, "missions: []"));
         end
@@ -117,6 +125,10 @@ function paths = expectedAdapterFiles(workspaceRoot, agentClient)
                 fullfile(workspaceRoot, ".codex", "skills", "create-tutor-mission", "SKILL.md")
                 fullfile(workspaceRoot, ".codex", "skills", "qa-mission", "SKILL.md")
                 fullfile(workspaceRoot, ".codex", "skills", "maintain-missions", "SKILL.md")
+                fullfile(workspaceRoot, ".codex", "skills", "evaluate-tutor-skill", "SKILL.md")
+                fullfile(workspaceRoot, ".codex", "skills", "simulate-mission-learner", "SKILL.md")
+                fullfile(workspaceRoot, ".codex", "skills", "references", "evaluation", "scripts", "evaluate.py")
+                fullfile(workspaceRoot, ".codex", "skills", "references", "evaluation", "scripts", "mission_evals", "combined.py")
                 fullfile(workspaceRoot, ".codex", "skills", "references", "mission-contract.md")
                 ];
         case "claude-code"
@@ -125,6 +137,8 @@ function paths = expectedAdapterFiles(workspaceRoot, agentClient)
                 fullfile(workspaceRoot, ".claude", "commands", "create-tutor-mission.md")
                 fullfile(workspaceRoot, ".claude", "commands", "qa-mission.md")
                 fullfile(workspaceRoot, ".claude", "commands", "maintain-missions.md")
+                fullfile(workspaceRoot, ".claude", "commands", "evaluate-tutor-skill.md")
+                fullfile(workspaceRoot, ".claude", "commands", "simulate-mission-learner.md")
                 ];
         case "gemini-cli"
             paths = fullfile(workspaceRoot, "GEMINI.md");
@@ -134,6 +148,8 @@ function paths = expectedAdapterFiles(workspaceRoot, agentClient)
                 fullfile(workspaceRoot, ".github", "prompts", "create-tutor-mission.prompt.md")
                 fullfile(workspaceRoot, ".github", "prompts", "qa-mission.prompt.md")
                 fullfile(workspaceRoot, ".github", "prompts", "maintain-missions.prompt.md")
+                fullfile(workspaceRoot, ".github", "prompts", "evaluate-tutor-skill.prompt.md")
+                fullfile(workspaceRoot, ".github", "prompts", "simulate-mission-learner.prompt.md")
                 ];
         case "github-copilot-cli"
             paths = fullfile(workspaceRoot, "COPILOT.md");

@@ -20,9 +20,8 @@ workspace. Setup should provide starting material, not complete later tasks.
 
 Before writing the setup script:
 
-1. Load the `matlab-script-writing` skill for coding conventions.
-2. Draft and run the code via `evaluate_matlab_code` or `run_matlab_file`.
-3. Only after successful execution, write the script beside `mission.yaml`.
+1. Draft and run the code via `evaluate_matlab_code` or `run_matlab_file`.
+2. Only after successful execution, write the script beside `mission.yaml`.
 
 `setup_<mission_name>.m` is the recommended naming convention, not a runtime requirement. The `setup.script` value in `mission.yaml` is authoritative.
 

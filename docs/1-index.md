@@ -23,7 +23,7 @@ data, models, or task-specific restart states.
 
 - [Set Up an Authoring Workspace](2-authoring-workflow.md#1-set-up-an-authoring-workspace) - create a marketplace draft and install agent guidance.
 - [Authoring Workflow](2-authoring-workflow.md) - the recommended mission lifecycle from first idea to maintenance.
-- [Skill Usage](3-skill-usage.md) - practical guidance for `create-tutor-mission`, `qa-mission`, and `maintain-missions`.
+- [Skill Usage](3-skill-usage.md) - mission authoring, QA, maintenance, tutor evaluation, and learner simulation.
 - [Mission YAML Overview](4-mission-yaml-overview.md) - a human-readable tour of the mission YAML structure.
 - [How to Author a Mission](5-how-to-author-a-mission.md) - a walkthrough from rough goal to reviewed mission.
 - [Runtime Validation](6-runtime-validation.md) - maintainer guidance for setup, reset, progress, and runtime smoke checks.

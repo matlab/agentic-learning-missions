@@ -7,5 +7,7 @@ Read `docs/1-index.md` before changing mission content. Start the requested work
 - `create-tutor-mission`
 - `qa-mission`
 - `maintain-missions`
+- `evaluate-tutor-skill` (Codex evaluation runner)
+- `simulate-mission-learner` (Codex evaluation runner)
 
 Set the `source_url` TODO in `marketplace/manifest.yaml` before publishing or registering the marketplace.
